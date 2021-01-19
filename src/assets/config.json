@@ -1,0 +1,83 @@
+{
+    "version": "1.5.2",
+    "buildDate": "20210115",
+    "Urls": {
+      "baseUrl": "/OWFTracks",
+      "refreshRate": "5000",
+      "trackCount": "2000",
+      "owfServer": "https://localhost:8443/owf",
+      "cotServiceActive": "CotServiceDev2",
+      "cotServiceProd": "",
+      "cotServiceStage": "https://10.10.30.178:8443/CotProviderSVC/rest/cotdummy",
+      "cotServiceDev1": "https://10.10.30.178:8443/CotProviderSVC/rest/cotdummy",
+      "cotServiceDev2": "https://localhost:8443/CotProviderSVC/rest/cotdummy",
+      "cotServerLocal": "/assets/testdata/testfile.json",
+      "geocoderUrl": "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates"
+    },
+    "mapInterface": {
+      "onPlot": true,
+      "onViewChange": false,
+      "filter": {
+        "area": "multiple"
+      }
+    },
+    "stateVersion": "1.4",
+    "layerParam": {
+      "defaults": {
+        "serviceType": "feature",
+        "format": "image/png",
+        "refreshInterval": "0.10",
+        "zoom": "false",
+        "showLabels": "false",
+        "opacity": "0.35",
+        "transparent": "true",
+        "useProxy": "false"
+      }
+    },
+    "directories": [
+      {
+        "name": "TRACKS",
+        "path": "/GlobalRepo/Catalogs/tracks.directory",
+        "layerParam": {
+          "overrides": {
+            "refreshInterval": "0.10",
+            "opacity": "1.0",
+            "mode": "ondemand"
+          }
+        }
+      }
+    ],
+    "tokenServices": [
+      {
+        "serviceUrl": "c3c-ap101-mc-01.maincgtest.adscgtest.uscg.mil:6443",
+        "token": "ZfH6BcMbWJTs3AJNw-bNAnpGzO-ZDTperUqq0Mw0YUzvUvN8TbImdYLGLuffnHQ4PHYG3axDVD2gXxyn4HeFXCAL1Un-TusVT_XhtKUUP9JM7Dbf573uEfrCVNN1nsb6"
+      },
+      {
+        "url": "/GlobalRepo/Catalogs/tracks-iocwk.token"
+      }
+    ],
+    "aisvtsServices": {
+      "connections": [
+        {
+          "name": "C3CEN_VTSLAB_01",
+          "url": "ws://localhost:18447/AISStreamServer/",
+          "position": {
+            "lat": 0.00,
+            "lon": 0.00
+          },
+          "roles": [
+            "VTS_C5I"
+          ]
+        }
+      ],
+      "roles": [
+        "AIS_USER"
+      ]
+    },
+    "sensors": [
+      {
+        "name": "MARYLAND-NCR",
+        "url": "/GlobalRepo/Sensors/MARYLAND-NCR.json"
+      }
+    ]
+  }
