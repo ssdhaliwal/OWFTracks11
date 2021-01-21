@@ -1,0 +1,22 @@
+<mat-menu #childMenu="matMenu" [overlapTrigger]="false">
+    <span
+        *ngFor="let child of childMenuItems">
+        <!-- Handle branch node menu items -->
+        <span *ngIf="child.children && child.children.length > 0">
+            <button mat-menu-item="mat-menu-item" color="primary" 
+                [disabled]="child.disabled" [matMenuTriggerFor]="childMenu">
+                <mat-icon>{{ child.iconName }}</mat-icon>
+                <span>{{ child.displayName }}</span>
+            </button>
+            <app-menu-child #childMenu="matMenu" [childMenuItems]="child.children"></app-menu-child>
+        </span>
+        <!-- Handle leaf node menu items -->
+        <span *ngIf="!child.children || child.children.length === 0">
+            <button mat-menu-item="mat-menu-item" [disabled]="child.disabled"
+                (click)="clickMenuItem(child)">
+                <mat-icon>{{ child.iconName }}</mat-icon>
+                <span>{{ child.displayName }}</span>
+            </button>
+        </span>
+    </span>
+</mat-menu>
