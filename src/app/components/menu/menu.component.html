@@ -1,26 +1,32 @@
 <mat-toolbar>
-    <button mat-icon-button="mat-icon-button" [matMenuTriggerFor]="clickmenu">
-        <mat-icon>more_vert</mat-icon>
-    </button>
-    <span>Selected Menu
-        {{selectedMenu}}</span>
+  <button mat-icon-button="mat-icon-button" [matMenuTriggerFor]="clickmenu">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+  <span>Selection/ {{ selectedMenu }}</span>
 </mat-toolbar>
 
 <mat-menu #clickmenu="matMenu">
-    <span *ngFor="let item of menuItems">
-        <span *ngIf="item.children && item.children.length > 0">
-            <button mat-menu-item="mat-menu-item" [disabled]="item.disabled" [matMenuTriggerFor]="menu">
-                <mat-icon>{{ item.iconName }}</mat-icon>
-                <span>
-                    {{ item.displayName }}</span>
-            </button>
-            <app-menu-child #menu="matMenu" [childMenuItems]="item.children" [selectedMenu]="selectedMenu"></app-menu-child>
-        </span>
-        <span *ngIf="!item.children || item.children.length === 0">
-            <button mat-menu-item="mat-menu-item" [disabled]="item.disabled" (click)="clickMenuItem(item)">
-                <mat-icon>{{ item.iconName }}</mat-icon>
-                <span>{{ item.displayName }}</span>
-            </button>
-        </span>
+  <span *ngFor="let item of menuItems">
+    <span *ngIf="item.children && item.children.length > 0">
+      <button
+        mat-menu-item="mat-menu-item"
+        [disabled]="item.disabled"
+        [matMenuTriggerFor]="menu.childMenu"
+      >
+        <mat-icon>{{ item.iconName }}</mat-icon>
+        <span> {{ item.displayName }}</span>
+      </button>
+      <app-menu-child #menu [childMenuItems]="item.children"></app-menu-child>
     </span>
+    <span *ngIf="!item.children || item.children.length === 0">
+      <button
+        mat-menu-item="mat-menu-item"
+        [disabled]="item.disabled"
+        (click)="clickMenuItem(item)"
+      >
+        <mat-icon>{{ item.iconName }}</mat-icon>
+        <span>{{ item.displayName }}</span>
+      </button>
+    </span>
+  </span>
 </mat-menu>

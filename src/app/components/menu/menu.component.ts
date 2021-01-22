@@ -13,16 +13,18 @@ export class MenuComponent implements OnInit, OnDestroy {
   menuItems: MenuItem[];
   subscription: Subscription;
 
-  selectedMenu: string = "";
+  selectedMenu: string = "{idle}";
 
   searchText: string = 'Search';
   isAvailable: boolean = false;
 
-  constructor(private notificationService: ActionNotificationService) { 
+  constructor(private notificationService: ActionNotificationService) {
     this.subscription = notificationService.publisher$.subscribe(
       payload => {
         // console.log(`${payload.action}, received by MenuComponent`);
-        if (payload.action === "MENU SYNC ROLES") {
+        if (payload.action === "MENUITEMSELECTED") {
+          this.selectedMenu = payload.value;
+        } else if (payload.action === "MENU SYNC ROLES") {
           if (payload.value.option === "AIS") {
             if (payload.value.active > 0) {
               let items: any = this.menuItems;
@@ -53,17 +55,21 @@ export class MenuComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    //console.log("app initialized.");
+
     // prevent memory leak when component destroyed
     this.subscription.unsubscribe();
   }
 
   clickMenuItem(menuItem) {
+    //console.log("app destroyed.");
+
     console.log(menuItem);
     this.selectedMenu = menuItem.displayName;
   }
 
   notifyMenu(event) {
-    this.notificationService.publisherAction({action:event.item.label});
+    this.notificationService.publisherAction({ action: event.item.label });
     this.searchText = event.item.label;
     //console.log(`${event.item.label}, pressed from MenuComponent`);
   }
@@ -76,7 +82,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     }
 
     //console.log(`search value: ${value}`);
-    this.notificationService.publisherAction({action:"search", data:value});
+    this.notificationService.publisherAction({ action: "search", data: value });
   }
 
 }

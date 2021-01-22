@@ -11,12 +11,11 @@ import { MenuItem, MenuModel } from '../../models/menu.model';
 })
 export class MenuChildComponent implements OnInit, OnDestroy {
   @Input() childMenuItems: MenuItem[];
-  @Input() selectedMenu: String = "";
-  @ViewChild('childMenu', {static: true}) public childMenu: any;
+  @ViewChild('childMenu', { static: true }) public childMenu;
 
   subscription: Subscription;
 
-  constructor(private notificationService: ActionNotificationService) { 
+  constructor(private notificationService: ActionNotificationService) {
     this.subscription = notificationService.publisher$.subscribe(
       payload => {
         // console.log(`${payload.action}, received by MenuComponent`);
@@ -25,14 +24,20 @@ export class MenuChildComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    //console.log("app initialized.");
+
   }
 
   ngOnDestroy(): void {
+    //console.log("app destroyed.");
+
+    // prevent memory leak when component destroyed
+    this.subscription.unsubscribe();
   }
 
   clickMenuItem(menuItem) {
     console.log(menuItem);
-    this.selectedMenu = menuItem.displayName;
+    this.notificationService.publisherAction({ action: 'MENUITEMSELECTED', value: menuItem.displayName });
   }
 
 }
