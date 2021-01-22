@@ -28,10 +28,14 @@ export class ConfigService {
 
 	constructor(private http: HttpClient,
 		private notificationService: ActionNotificationService) {
+		//console.log("ConfigService constructor.");
+
 		this.retrieveConfig();
 	}
 
 	private retrieveConfig(): void {
+		//console.log("ConfigService retrieveConfig.");
+
 		this.configObservable = this.http
 			.get<any>(this.baseUrl, { responseType: 'json', withCredentials: true })
 			.pipe(
@@ -84,32 +88,46 @@ export class ConfigService {
 	}
 
 	getConfig() {
+		//console.log("ConfigService getConfig.");
+
 		return this.configModel;
 	}
 
 	getBaseHref() {
+		//console.log("ConfigService getBaseHref.");
+
 		return this.configModel.Urls["baseUrl"] + "-" + this.configModel.version;
 	}
 
 	getMemoryValue(key) {
+		//console.log("ConfigService getMemoryValue.");
+
 		return this.memoryPersistence[key];
 	}
 
 	removeMemoryValue(key) {
+		//console.log("ConfigService removeMemoryValue.");
+
 		delete this.memoryPersistence[key];
 	}
 
 	setMemoryValue(key, value) {
+		//console.log("ConfigService setMemoryValue.");
+
 		this.memoryPersistence[key] = value;
 	}
 
 	addUrlAuthentication(key) {
+		//console.log("ConfigService addUrlAuthentication.");
+
 		if (!this.checkUrlAuthentication(key)) {
 			this.urlAuthorization.push(key);
 		}
 	}
 
 	checkUrlAuthentication(key) {
+		//console.log("ConfigService checkUrlAuthentication.");
+
 		if (this.urlAuthorization.indexOf(key) >= 0) {
 			return true;
 		} else {
@@ -118,16 +136,22 @@ export class ConfigService {
 	}
 
 	encryptString(keys, value) {
+		//console.log("ConfigService encryptString.");
+
 		let result = CryptoJS.AES.encrypt(value.trim(), keys.trim()).toString();
 		return result;
 	}
 
 	decryptString(keys, value) {
+		//console.log("ConfigService decryptString.");
+
 		let result = CryptoJS.AES.decrypt(value.trim(), keys.trim()).toString(CryptoJS.enc.Utf8);
 		return result;
 	}
 
 	getResourceFile(fileurl): Observable<any> {
+		//console.log("ConfigService getResourceFile.");
+
 		const httpOptions = {
 			headers: new HttpHeaders({
 				'Content-Type': 'application/json'
@@ -146,10 +170,14 @@ export class ConfigService {
 	}
 
 	private processResponse(response) {
+		//console.log("ConfigService processResponse.");
+
 		// console.log(response.headers, response.status, response.type);
 	}
 
 	private handleError<T>(operation = 'operation', result?: T) {
+		//console.log("ConfigService handleError.");
+
 		return (error: any): Observable<T> => {
 
 			// TODO: send the error to remote logging infrastructure

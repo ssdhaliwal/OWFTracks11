@@ -13,14 +13,20 @@ export class ActionNotificationService {
   publisher$ = this.publisherSource.asObservable();
   subscriber$ = this.subscriberSource.asObservable();
 
-  constructor() { }
+  constructor() {
+		//console.log("ActionNotificationService handleError.");
+  }
 
   // Service message commands
   publisherAction(item: any) {
+		//console.log("ActionNotificationService publisherAction.");
+
     this.publisherSource.next(item);
   }
 
   subscriberAction(item: any) {
+		//console.log("ActionNotificationService subscriberAction.");
+
     this.subscriberSource.next(item);
   }
 }

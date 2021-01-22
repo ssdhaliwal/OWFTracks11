@@ -16,6 +16,8 @@ export class MenuChildComponent implements OnInit, OnDestroy {
   subscription: Subscription;
 
   constructor(private notificationService: ActionNotificationService) {
+		//console.log("MenuChildComponent constructor.");
+
     this.subscription = notificationService.publisher$.subscribe(
       payload => {
         // console.log(`${payload.action}, received by MenuComponent`);
@@ -24,18 +26,20 @@ export class MenuChildComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    //console.log("app initialized.");
+		//console.log("MenuChildComponent ngOnInit.");
 
   }
 
   ngOnDestroy(): void {
-    //console.log("app destroyed.");
+		//console.log("MenuChildComponent ngOnDestroy.");
 
     // prevent memory leak when component destroyed
     this.subscription.unsubscribe();
   }
 
   clickMenuItem(menuItem) {
+		//console.log("MenuChildComponent clickMenuItem.");
+
     console.log(menuItem);
     this.notificationService.publisherAction({ action: 'MENUITEMSELECTED', value: menuItem.displayName });
   }

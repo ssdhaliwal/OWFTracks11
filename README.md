@@ -139,4 +139,5 @@ npm install --save @types/crypto-js
 ng g class models/menu --type=model
 ng g component components/menu-child
 
-https://www.angularjswiki.com/material/menu/#menu-items-in-angular
+https://juristr.com/blog/2017/07/ng2-dynamic-tab-component/
+https://jtblin.github.io/angular-chart.js/

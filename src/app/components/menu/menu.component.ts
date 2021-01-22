@@ -19,6 +19,8 @@ export class MenuComponent implements OnInit, OnDestroy {
   isAvailable: boolean = false;
 
   constructor(private notificationService: ActionNotificationService) {
+		//console.log("MenuComponent constructor.");
+
     this.subscription = notificationService.publisher$.subscribe(
       payload => {
         // console.log(`${payload.action}, received by MenuComponent`);
@@ -37,51 +39,41 @@ export class MenuComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+		//console.log("MenuComponent ngOnInit.");
+
     this.menuItems = MenuModel;
-    //this.menuItems[1].children[1].disabled = true;
-
-    /*
-    // add commands to menu model
-    let items: any = this.menuItems;
-
-    items.items[0].items[0].command = this.notifyMenu.bind(this);  // Service -> Load CSV
-    items.items[0].items[1].command = this.notifyMenu.bind(this);  // Service -> Load Shape
-    items.items[0].items[2].command = this.notifyMenu.bind(this);  // Service -> Load Feature
-    items.items[0].items[3].command = this.notifyMenu.bind(this);  // Service -> Load SEARCH
-    items.items[0].items[4].command = this.notifyMenu.bind(this);  // Service -> Load SENSORS
-    items.items[0].items[5].command = this.notifyMenu.bind(this);  // Service -> Load AIS/VTS
-    //items.items[1].items[0].command = this.notifyMenu.bind(this);  // help -> about
-    */
   }
 
   ngOnDestroy() {
-    //console.log("app initialized.");
+		//console.log("MenuComponent ngOnDestroy.");
 
     // prevent memory leak when component destroyed
     this.subscription.unsubscribe();
   }
 
   clickMenuItem(menuItem) {
-    //console.log("app destroyed.");
+		//console.log("MenuComponent clickMenuItem.");
 
     console.log(menuItem);
     this.selectedMenu = menuItem.displayName;
   }
 
   notifyMenu(event) {
+		//console.log("MenuComponent notifyMenu.");
+
     this.notificationService.publisherAction({ action: event.item.label });
     this.searchText = event.item.label;
-    //console.log(`${event.item.label}, pressed from MenuComponent`);
   }
 
   onSearchEnter(value: string) {
+		//console.log("MenuComponent onSearchEnter.");
+
     if (value === '') {
       this.searchText = 'Search';
     } else {
       this.searchText = value;
     }
 
-    //console.log(`search value: ${value}`);
     this.notificationService.publisherAction({ action: "search", data: value });
   }
 

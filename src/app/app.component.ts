@@ -21,6 +21,8 @@ export class AppComponent {
 		private router: Router,
 		private notificationService: ActionNotificationService,
 		private configService: ConfigService) {
+		//console.log("AppComponent constructor.");
+
 		this.subscription = this.notificationService.publisher$.subscribe(
 			payload => {
 				console.log(`${payload.action}, received by AppComponent`);
@@ -47,11 +49,11 @@ export class AppComponent {
 	}
 
 	ngOnInit() {
-		//console.log("app initialized.");
+		//console.log("AppComponent ngOnInit.");
 	}
 
 	ngOnDestroy() {
-		//console.log("app destroyed.");
+		//console.log("AppComponent ngOnDestroy.");
 
 		// prevent memory leak when component destroyed
 		this.subscription.unsubscribe();
