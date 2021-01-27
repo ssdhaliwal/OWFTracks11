@@ -1,6 +1,6 @@
 {
-    "version": "1.5.2",
-    "buildDate": "20210115",
+    "version": "2.0.0",
+    "buildDate": "20210121",
     "Urls": {
       "baseUrl": "/OWFTracks",
       "refreshRate": "5000",

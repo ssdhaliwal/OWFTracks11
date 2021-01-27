@@ -1,0 +1,16 @@
+::ng-deep .blue-snackbar {
+    background: #2196F3;
+}
+::ng-deep .red-snackbar {
+    background: #f32121;
+}
+::ng-deep .orange-snackbar {
+    background: #f3cd21;
+}
+::ng-deep .green-snackbar {
+    background: #52f321;
+}
+::ng-deep .white-snackbar {
+    background: #ffffff;
+    color: black;
+}

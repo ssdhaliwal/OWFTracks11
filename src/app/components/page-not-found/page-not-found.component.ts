@@ -10,14 +10,15 @@ export class PageNotFoundComponent implements OnInit, OnDestroy {
   description: string = '';
   
   constructor(private route: ActivatedRoute, private router: Router) { 
-		//console.log("PageNotFoundComponent constructor.");
+    //console.log("PageNotFoundComponent constructor.");
+    console.log("PageNotFoundComponent created...");
   }
 
   ngOnInit(): void {
 		//console.log("PageNotFoundComponent ngOnInit.");
 
-    this.route.params.subscribe(params => {
-      console.log(".. PageNotFoundComponent/ ", params);
+    this.route.params.subscribe(payload => {
+      // console.log(`${payload.action}/${payload.value}, received by PageNotFoundComponent`);
     });
   }
 

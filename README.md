@@ -42,6 +42,9 @@ node_modules/primeng/api/menuitem.d.ts(1,10): error TS2305: Module '"E:/home/dev
 import { QueryParamsHandling } from '@angular/router/src/config';
 ===============================================================================================
 
+certutil -hashfile {filename} MD5
+===============================================================================================
+
 - check node and npm
 node --version
 v12.18.4
@@ -100,6 +103,7 @@ npm run start
 ng add @angular/material
 
 >update the routes<
+** ng g module app-routing --flat
 ng g component components/page-not-found
 ng g component components/growler
 
@@ -138,6 +142,37 @@ npm install --save @types/crypto-js
 >fix menu with/options - dynamic<
 ng g class models/menu --type=model
 ng g component components/menu-child
+
+https://www.angularjswiki.com/material/menu/#menu-items-in-angular
+
+>add owf and js libraries<
+ng g class library/jsUtils
+ng g class library/owf-api
+
+>add the csv module<
+npm install --save ag-grid-community ag-grid-angular
+npm install papaparse --save
+npm install --save xlsx
+npm install @ag-grid-community/all-modules --save
+
+ng g class models/gis-query --type=model
+ng g class models/map-view --type=model
+ng g class models/owf-container --type=model
+ng g class models/owf-preferences --type=model
+ng g class models/status --type=model
+ng g class models/user --type=model
+
+ng g service service/map-message
+ng g service service/owf-container
+ng g service service/owf-core
+ng g service service/owf-preferences
+
+ng g module modules/csv
+ng g component modules/csv/csv-core
+ng g component modules/csv/csv-grid
+ng g class modules/csv/web-workers/csv-to-kml.worker
+
+npm install --save  @angular-material-components/color-picker
 
 https://juristr.com/blog/2017/07/ng2-dynamic-tab-component/
 https://jtblin.github.io/angular-chart.js/

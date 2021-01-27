@@ -1,7 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
-import { AppRoutingModule } from './app-routing.module';
+import { Routes, RouterModule } from '@angular/router';
+
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
@@ -37,6 +38,9 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
+import { AgGridModule } from 'ag-grid-angular';
+import { MAT_COLOR_FORMATS, NgxMatColorPickerModule, NGX_MAT_COLOR_FORMATS } from '@angular-material-components/color-picker';
+
 import { SharedServicesModule } from './modules/shared-services.module';
 
 import { MenuChildComponent } from './components/menu-child/menu-child.component';
@@ -44,18 +48,29 @@ import { MenuComponent } from './components/menu/menu.component';
 import { GrowlerComponent } from './components/growler/growler.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 
+import { CsvModule } from './modules/csv/csv.module';
+
+const routes: Routes = [
+  { path: 'service', loadChildren: './modules/csv/csv.module#CsvModule' },
+  { path: '', redirectTo: '/', pathMatch: 'full' },
+  { path: 'message/:severity', component: GrowlerComponent },
+  { path: '**', component: PageNotFoundComponent, outlet: 'trackOutlet' },
+  { path: '**', component: PageNotFoundComponent, outlet: 'errorOutlet' },
+  { path: '**', redirectTo: 'message' }
+];
+
 @NgModule({
   declarations: [
     AppComponent,
     MenuChildComponent,
     MenuComponent,
     GrowlerComponent,
-    PageNotFoundComponent,
-    MenuChildComponent
+    PageNotFoundComponent
   ],
   imports: [
+    RouterModule.forRoot(routes,
+      { useHash: true /*, enableTracing: true */ }),
     BrowserModule,
-    AppRoutingModule,
     BrowserAnimationsModule,
     NoopAnimationsModule,
     HttpClientModule,
@@ -89,9 +104,12 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
     MatTabsModule,
     MatToolbarModule,
     MatTooltipModule,
+    CsvModule,
+    AgGridModule.withComponents([]),
+    NgxMatColorPickerModule,
     SharedServicesModule.forRoot()
   ],
-  providers: [],
+  providers: [{ provide: MAT_COLOR_FORMATS, useValue: NGX_MAT_COLOR_FORMATS }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

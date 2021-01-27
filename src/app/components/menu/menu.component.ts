@@ -29,8 +29,6 @@ export class MenuComponent implements OnInit, OnDestroy {
         } else if (payload.action === "MENU SYNC ROLES") {
           if (payload.value.option === "AIS") {
             if (payload.value.active > 0) {
-              let items: any = this.menuItems;
-              // items.items[0].items[5].visible = true;
             }
           }
         }
@@ -54,27 +52,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   clickMenuItem(menuItem) {
 		//console.log("MenuComponent clickMenuItem.");
 
-    console.log(menuItem);
     this.selectedMenu = menuItem.displayName;
-  }
-
-  notifyMenu(event) {
-		//console.log("MenuComponent notifyMenu.");
-
-    this.notificationService.publisherAction({ action: event.item.label });
-    this.searchText = event.item.label;
-  }
-
-  onSearchEnter(value: string) {
-		//console.log("MenuComponent onSearchEnter.");
-
-    if (value === '') {
-      this.searchText = 'Search';
-    } else {
-      this.searchText = value;
-    }
-
-    this.notificationService.publisherAction({ action: "search", data: value });
   }
 
 }
