@@ -3,8 +3,11 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 
 import { FormsModule } from '@angular/forms';
+
+import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { MatIconModule } from '@angular/material/icon';
 
 import { AgGridModule } from 'ag-grid-angular';
 import { SharedServicesModule } from '../shared-services.module';
@@ -32,6 +35,8 @@ const appRoutes: Routes = [
     FormsModule,
     MatFormFieldModule,
     MatGridListModule,
+    MatButtonModule,
+    MatIconModule,
     AgGridModule.withComponents([]),
     SharedServicesModule.forRoot()
   ],
