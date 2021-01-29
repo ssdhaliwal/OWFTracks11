@@ -15,13 +15,13 @@
 
 .csvGridListContent {
     background: green;
-    height: calc(100vh - 92px);
+    height: calc(100vh - 103px);
     padding: 0 !important;
 }
 
 .csvGridListContentData {
     background: green;
-    height: calc(100vh - 92px);
+    height: calc(100vh - 103px);
     padding: 0 !important;
 }
 
@@ -32,6 +32,24 @@
 }
 
 .csvButtonIcon {
+    margin-top: 3px;
     vertical-align: unset;
     padding: 0 !important;
+}
+
+.csvFloatLeft {
+    float: left;
+}
+
+.csvFloatRight {
+    float: right;
+}
+
+.csvAlignLeft {
+    margin-left: 5px;
+    width: 100%;
+}
+.csvAlignRight {
+    margin-right: 5px;
+    width: 100%;
 }

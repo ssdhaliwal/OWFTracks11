@@ -1,18 +1,35 @@
-<mat-grid-list #csvGridList cols="10" class="csvGridList">
-  <mat-grid-tile colspan=1 rowspan=1 class="csvGridListHeader">
-    <button mat-icon-button color="primary" class="csvButton"><mat-icon class="csvButtonIcon">refresh</mat-icon></button>
-    <button mat-icon-button color="primary" class="csvButton"><mat-icon class="csvButtonIcon">share</mat-icon></button>
-  </mat-grid-tile>
-  <mat-grid-tile colspan=1 rowspan=1 class="csvGridListHeader">2</mat-grid-tile>
-  <mat-grid-tile colspan=1 rowspan=1 class="csvGridListHeader">3</mat-grid-tile>
-  <mat-grid-tile colspan=1 rowspan=1 class="csvGridListHeader">4</mat-grid-tile>
-  <mat-grid-tile colspan=1 rowspan=1 class="csvGridListHeader">5</mat-grid-tile>
-  <mat-grid-tile colspan=1 rowspan=1 class="csvGridListHeader">6</mat-grid-tile>
-  <mat-grid-tile colspan=1 rowspan=1 class="csvGridListHeader">7</mat-grid-tile>
-  <mat-grid-tile colspan=1 rowspan=1 class="csvGridListHeader">8</mat-grid-tile>
-  <mat-grid-tile colspan=1 rowspan=1 class="csvGridListHeader">9</mat-grid-tile>
-  <mat-grid-tile colspan=1 rowspan=1 class="csvGridListHeader">10</mat-grid-tile>
+<mat-grid-list #csvGridListMaster cols="10" class="csvGridList">
+    <mat-grid-tile colspan="1" rowspan="1" class="csvGridListHeader">
+        <span *ngIf="loadComponent" class="csvAlignLeft">
+            <button mat-icon-button="mat-icon-button" #csvBtnRefresh color="primary" class="csvButton csvFloatLeft">
+                <mat-icon class="csvButtonIcon">refresh</mat-icon>
+            </button>
+            <button mat-icon-button="mat-icon-button" #csvBtnShare color="primary" class="csvButton csvFloatLeft" *ngIf="isDataValid">
+                <mat-icon class="csvButtonIcon">share</mat-icon>
+            </button>
+        </span>
+    </mat-grid-tile>
+    <mat-grid-tile colspan="1" rowspan="1" class="csvGridListHeader">2</mat-grid-tile>
+    <mat-grid-tile colspan="3" rowspan="1" class="csvGridListHeader">
+        <span *ngIf="loadComponent && loadMMSISync"></span>
+    </mat-grid-tile>
+    <mat-grid-tile colspan="1" rowspan="1" class="csvGridListHeader">6</mat-grid-tile>
+    <mat-grid-tile colspan="4" rowspan="1" class="csvGridListHeader">
+        <span *ngIf="loadComponent" class="csvAlignRight">
+            <button mat-icon-button="mat-icon-button" #csvBtnZoom color="primary" class="csvButton csvFloatRight" *ngIf="isDataValid">
+                <mat-icon class="csvButtonIcon">my_location</mat-icon>
+            </button>
+            <button mat-icon-button="mat-icon-button" #csvBtnLabel color="primary" class="csvButton csvFloatRight" *ngIf="isDataValid">
+                <mat-icon class="csvButtonIcon">label</mat-icon>
+            </button>
+            <button mat-icon-button="mat-icon-button" #csvBtnMap color="primary" class="csvButton csvFloatRight" *ngIf="isDataValid">
+                <mat-icon class="csvButtonIcon">map</mat-icon>
+            </button>
+        </span>
+    </mat-grid-tile>
 </mat-grid-list>
-<mat-grid-list #csvGridList cols="10" class="csvGridListContent">
-  <mat-grid-tile colspan=10 rowspan=1 class="csvGridListContentData">CONTENT</mat-grid-tile>
+<mat-grid-list #csvGridListDetail cols="10" class="csvGridListContent">
+    <mat-grid-tile colspan="10" rowspan="1" class="csvGridListContentData">
+        <app-csv-grid *ngIf="loadComponent" [parentFileName]="filename" [parentData]="records" [parentMessage]="searchValue" [parentColor]="color" [parentGeocode]="geocodeAddress"></app-csv-grid>
+    </mat-grid-tile>
 </mat-grid-list>

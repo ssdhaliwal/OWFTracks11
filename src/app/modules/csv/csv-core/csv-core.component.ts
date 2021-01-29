@@ -32,13 +32,33 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
   config: ConfigModel = null;
   subscription: Subscription;
   
+  public isDataValid: boolean = false;
+  public loadComponent: boolean = false;
+  public loadMMSISync: boolean = false;
+
+  public filename: string = "";
+  public color: any = "#f38c06";
+  public records: any[] = [];
+  public searchValue: string;
+  public geocodeAddress: boolean = false;
+
   colorCtr: AbstractControl = new FormControl(new Color(255, 243, 0), [Validators.required]);
 
-  constructor() {
+  constructor(private _zone: NgZone,
+    private configService: ConfigService,
+    private userCoreService: UserCoreService,
+    private notificationService: ActionNotificationService,
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit() {
     //console.log("csv-core initialized.");
+    this.isDataValid = true;
+    this.loadComponent = true;
+    this.loadMMSISync = false;
+
+    this.cdr.detectChanges();
   }
 
   ngOnDestroy() {
