@@ -1,55 +1,60 @@
 .csvGridList {
-    background-color: #428bca;
-    color: white;
-    width: 100%;
-    height: 35px;
-    font-size: 12px;
-    padding: 0 !important;
+  background-color: #428bca;
+  color: white;
+  width: 100%;
+  height: 35px;
+  font-size: 12px;
+  padding: 0 !important;
 }
 
 .csvGridListHeader {
-    background: #428bca;
-    height: 35px;
-    padding: 0 !important;
+  background: #428bca;
+  height: 35px;
+  padding: 0 !important;
 }
 
 .csvGridListContent {
-    background: green;
-    height: calc(100vh - 103px);
-    padding: 0 !important;
+  background: green;
+  height: calc(100vh - 103px);
+  padding: 0 !important;
 }
 
 .csvGridListContentData {
-    background: green;
-    height: calc(100vh - 103px);
-    padding: 0 !important;
+  background: green;
+  height: calc(100vh - 103px);
+  padding: 0 !important;
 }
 
 .csvButton {
-    height: 24px;
-    width: 24px;
-    padding: 0 !important;
+  height: 24px;
+  width: 24px;
+  padding: 0 !important;
 }
 
 .csvButtonIcon {
-    margin-top: 3px;
-    vertical-align: unset;
-    padding: 0 !important;
+  margin-top: 3px;
+  vertical-align: unset;
+  padding: 0 !important;
 }
 
-.csvFloatLeft {
-    float: left;
+.csvGridTileOverflowUnset {
+    overflow: unset;
+  }
+  
+.csvGridTileFloatLeft {
+  float: left;
 }
 
-.csvFloatRight {
-    float: right;
+.csvGridTileFloatRight {
+  float: right;
 }
 
-.csvAlignLeft {
-    margin-left: 5px;
-    width: 100%;
+.csvGridTileAlignLeft {
+  margin-left: 5px;
+  width: 100%;
 }
-.csvAlignRight {
-    margin-right: 5px;
-    width: 100%;
+
+.csvGridTileAlignRight {
+  margin-right: 5px;
+  width: 100%;
 }

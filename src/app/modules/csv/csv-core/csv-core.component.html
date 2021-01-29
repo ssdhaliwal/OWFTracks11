@@ -1,29 +1,39 @@
 <mat-grid-list #csvGridListMaster cols="10" class="csvGridList">
     <mat-grid-tile colspan="1" rowspan="1" class="csvGridListHeader">
-        <span *ngIf="loadComponent" class="csvAlignLeft">
-            <button mat-icon-button="mat-icon-button" #csvBtnRefresh color="primary" class="csvButton csvFloatLeft">
+        <span *ngIf="loadComponent" class="csvGridTileAlignLeft">
+            <button mat-icon-button="mat-icon-button" #csvBtnRefresh color="primary" class="csvButton csvGridTileFloatLeft">
                 <mat-icon class="csvButtonIcon">refresh</mat-icon>
             </button>
-            <button mat-icon-button="mat-icon-button" #csvBtnShare color="primary" class="csvButton csvFloatLeft" *ngIf="isDataValid">
+            <button mat-icon-button="mat-icon-button" #csvBtnShare color="primary" class="csvButton csvGridTileFloatLeft" *ngIf="isDataValid">
                 <mat-icon class="csvButtonIcon">share</mat-icon>
             </button>
         </span>
     </mat-grid-tile>
     <mat-grid-tile colspan="1" rowspan="1" class="csvGridListHeader">2</mat-grid-tile>
     <mat-grid-tile colspan="3" rowspan="1" class="csvGridListHeader">
-        <span *ngIf="loadComponent && loadMMSISync"></span>
+        <span *ngIf="loadComponent && loadMMSISync">
+            <mat-form-field appearance="fill" style="height: 24px;">
+                <mat-label>Layers</mat-label>
+                <mat-select>
+                    <mat-option *ngFor="let layer of mmsiLayers" [value]="layer.value">
+                        {{layer.viewValue}}
+                      </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </span>
     </mat-grid-tile>
     <mat-grid-tile colspan="1" rowspan="1" class="csvGridListHeader">6</mat-grid-tile>
-    <mat-grid-tile colspan="4" rowspan="1" class="csvGridListHeader">
-        <span *ngIf="loadComponent" class="csvAlignRight">
-            <button mat-icon-button="mat-icon-button" #csvBtnZoom color="primary" class="csvButton csvFloatRight" *ngIf="isDataValid">
+    <mat-grid-tile colspan="4" rowspan="1" class="csvGridListHeader csvGridTileOverflowUnset">
+        <span *ngIf="loadComponent" class="csvGridTileAlignRight">
+            <button mat-icon-button="mat-icon-button" #csvBtnZoom color="primary" class="csvButton csvGridTileFloatRight" *ngIf="isDataValid">
                 <mat-icon class="csvButtonIcon">my_location</mat-icon>
             </button>
-            <button mat-icon-button="mat-icon-button" #csvBtnLabel color="primary" class="csvButton csvFloatRight" *ngIf="isDataValid">
+            <button mat-icon-button="mat-icon-button" #csvBtnLabel color="primary" class="csvButton csvGridTileFloatRight" *ngIf="isDataValid">
                 <mat-icon class="csvButtonIcon">label</mat-icon>
             </button>
-            <input [style.background]="color13" [cpAlphaChannel]="'always'" [cpOutputFormat]="'rgba'" [cpPresetColors]="['#fff', '#2889e9']" [cpAddColorButton]="true" [(colorPicker)]="color13"/>
-            <button mat-icon-button="mat-icon-button" #csvBtnMap color="primary" class="csvButton csvFloatRight" *ngIf="isDataValid">
+            <mat-icon class="csvButtonIcon csvGridTileFloatRight" [style.color]="color" [cpPosition]="'bottom'" [cpPositionOffset]="'50%'" [cpPositionRelativeToArrow]="true"
+                [(colorPicker)]="color" [cpPosition]="'bottom-left'">color_lens</mat-icon>
+           <button mat-icon-button="mat-icon-button" #csvBtnMap color="primary" class="csvButton csvGridTileFloatRight" *ngIf="isDataValid">
                 <mat-icon class="csvButtonIcon">map</mat-icon>
             </button>
         </span>
@@ -31,6 +41,7 @@
 </mat-grid-list>
 <mat-grid-list #csvGridListDetail cols="10" class="csvGridListContent">
     <mat-grid-tile colspan="10" rowspan="1" class="csvGridListContentData">
-        <app-csv-grid *ngIf="loadComponent" [parentFileName]="filename" [parentData]="records" [parentMessage]="searchValue" [parentColor]="color" [parentGeocode]="geocodeAddress"></app-csv-grid>
+        <app-csv-grid *ngIf="loadComponent" [parentFileName]="filename" [parentData]="records" [parentMessage]="searchValue" 
+            [parentColor]="color" [parentGeocode]="geocodeAddress"></app-csv-grid>
     </mat-grid-tile>
 </mat-grid-list>

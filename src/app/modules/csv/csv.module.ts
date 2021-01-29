@@ -9,6 +9,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 
 import { AgGridModule } from 'ag-grid-angular';
 import { ColorPickerModule } from 'ngx-color-picker';
@@ -40,6 +42,8 @@ const appRoutes: Routes = [
     MatGridListModule,
     MatButtonModule,
     MatIconModule,
+    MatInputModule,
+    MatSelectModule,
     AgGridModule.withComponents([]),
     ColorPickerModule,
     SharedServicesModule.forRoot()

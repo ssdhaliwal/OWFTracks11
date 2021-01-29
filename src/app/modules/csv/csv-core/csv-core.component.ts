@@ -16,11 +16,9 @@ import { OwfApi } from '../../../library/owf-api';
 import { AbstractControl, FormControl, Validators } from '@angular/forms';
 import { ColorPickerService, Cmyk } from 'ngx-color-picker';
 
-export interface Tile {
-  color: string;
-  cols: number;
-  rows: number;
-  text: string;
+interface Layers {
+  value: string;
+  viewValue: string;
 }
 
 @Component({
@@ -43,6 +41,13 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
   public geocodeAddress: boolean = false;
 
   public color13: string = 'rgba(0,255,0,0.5)';
+  public colorToggle: boolean = false;
+
+  public mmsiLayers: Layers[] = [
+    {value: 'steak-0', viewValue: 'Steak'},
+    {value: 'pizza-1', viewValue: 'Pizza'},
+    {value: 'tacos-2', viewValue: 'Tacos'}
+  ];
 
   constructor(private _zone: NgZone,
     private configService: ConfigService,
@@ -57,7 +62,7 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
     //console.log("csv-core initialized.");
     this.isDataValid = true;
     this.loadComponent = true;
-    this.loadMMSISync = false;
+    this.loadMMSISync = true;
 
     this.cdr.detectChanges();
   }
