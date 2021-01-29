@@ -22,6 +22,7 @@
             <button mat-icon-button="mat-icon-button" #csvBtnLabel color="primary" class="csvButton csvFloatRight" *ngIf="isDataValid">
                 <mat-icon class="csvButtonIcon">label</mat-icon>
             </button>
+            <input [style.background]="color13" [cpAlphaChannel]="'always'" [cpOutputFormat]="'rgba'" [cpPresetColors]="['#fff', '#2889e9']" [cpAddColorButton]="true" [(colorPicker)]="color13"/>
             <button mat-icon-button="mat-icon-button" #csvBtnMap color="primary" class="csvButton csvFloatRight" *ngIf="isDataValid">
                 <mat-icon class="csvButtonIcon">map</mat-icon>
             </button>

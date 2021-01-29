@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 
+import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -10,6 +11,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 
 import { AgGridModule } from 'ag-grid-angular';
+import { ColorPickerModule } from 'ngx-color-picker';
 import { SharedServicesModule } from '../shared-services.module';
 
 import { CsvCoreComponent } from './csv-core/csv-core.component';
@@ -32,12 +34,14 @@ const appRoutes: Routes = [
   imports: [
     CommonModule,
     RouterModule.forChild(appRoutes),
+    NoopAnimationsModule,
     FormsModule,
     MatFormFieldModule,
     MatGridListModule,
     MatButtonModule,
     MatIconModule,
     AgGridModule.withComponents([]),
+    ColorPickerModule,
     SharedServicesModule.forRoot()
   ],
   exports: [CsvCoreComponent, CsvGridComponent]

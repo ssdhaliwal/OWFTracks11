@@ -39,7 +39,7 @@ export class CsvGridComponent implements OnInit, OnDestroy {
   parentMessage: string;
 
   @Input()
-  parentColor: any[];
+  parentColor: string;
 
   @Input()
   parentGeocode: boolean;

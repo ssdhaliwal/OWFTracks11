@@ -14,7 +14,7 @@ import { jsUtils } from '../../../library/js-utils';
 import { OwfApi } from '../../../library/owf-api';
 
 import { AbstractControl, FormControl, Validators } from '@angular/forms';
-import { Color } from '@angular-material-components/color-picker';
+import { ColorPickerService, Cmyk } from 'ngx-color-picker';
 
 export interface Tile {
   color: string;
@@ -37,18 +37,19 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
   public loadMMSISync: boolean = false;
 
   public filename: string = "";
-  public color: any = "#f38c06";
+  public color: string = "#ffffff";
   public records: any[] = [];
   public searchValue: string;
   public geocodeAddress: boolean = false;
 
-  colorCtr: AbstractControl = new FormControl(new Color(255, 243, 0), [Validators.required]);
+  public color13: string = 'rgba(0,255,0,0.5)';
 
   constructor(private _zone: NgZone,
     private configService: ConfigService,
     private userCoreService: UserCoreService,
     private notificationService: ActionNotificationService,
     private http: HttpClient,
+    private cpService: ColorPickerService,
     private cdr: ChangeDetectorRef) {
   }
 

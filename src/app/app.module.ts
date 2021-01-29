@@ -39,8 +39,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { AgGridModule } from 'ag-grid-angular';
-import { MAT_COLOR_FORMATS, NgxMatColorPickerModule, NGX_MAT_COLOR_FORMATS } from '@angular-material-components/color-picker';
-
+import { ColorPickerModule } from 'ngx-color-picker';
 import { SharedServicesModule } from './modules/shared-services.module';
 
 import { MenuChildComponent } from './components/menu-child/menu-child.component';
@@ -104,12 +103,12 @@ const routes: Routes = [
     MatTabsModule,
     MatToolbarModule,
     MatTooltipModule,
-    CsvModule,
     AgGridModule.withComponents([]),
-    NgxMatColorPickerModule,
-    SharedServicesModule.forRoot()
+    ColorPickerModule,
+    SharedServicesModule.forRoot(),
+    CsvModule
   ],
-  providers: [{ provide: MAT_COLOR_FORMATS, useValue: NGX_MAT_COLOR_FORMATS }],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
