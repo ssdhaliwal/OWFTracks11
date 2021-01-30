@@ -1,15 +1,15 @@
 <mat-grid-list #csvGridListMaster cols="10" class="csvGridList">
     <mat-grid-tile colspan="1" rowspan="1" class="csvGridListHeader">
         <span *ngIf="loadComponent" class="csvGridTileAlignLeft">
-            <button mat-icon-button="mat-icon-button" #csvBtnRefresh color="primary" class="csvButton csvGridTileFloatLeft">
-                <mat-icon class="csvButtonIcon">refresh</mat-icon>
+            <button mat-icon-button="mat-icon-button" #csvBtnReset color="primary" class="csvButton csvGridTileFloatLeft">
+                <mat-icon class="csvButtonIcon" style="vertical-align: baseline;">replay</mat-icon>
             </button>
             <button mat-icon-button="mat-icon-button" #csvBtnShare color="primary" class="csvButton csvGridTileFloatLeft" *ngIf="isDataValid">
-                <mat-icon class="csvButtonIcon">share</mat-icon>
+                <mat-icon class="csvButtonIcon" style="vertical-align: baseline;">share</mat-icon>
             </button>
         </span>
     </mat-grid-tile>
-    <mat-grid-tile colspan="1" rowspan="1" class="csvGridListHeader">2</mat-grid-tile>
+    <mat-grid-tile colspan="1" rowspan="1" class="csvGridListHeader"></mat-grid-tile>
     <mat-grid-tile colspan="3" rowspan="1" class="csvGridListHeader">
         <span *ngIf="loadComponent && loadMMSISync">
             <mat-form-field appearance="fill" style="height: 24px;">
@@ -20,20 +20,30 @@
                       </mat-option>
                 </mat-select>
             </mat-form-field>
+            <button mat-icon-button="mat-icon-button" #csvBtnRefresh color="primary" class="csvButton">
+                <mat-icon class="csvButtonIcon" style="vertical-align: baseline;">update</mat-icon>
+            </button>
         </span>
     </mat-grid-tile>
-    <mat-grid-tile colspan="1" rowspan="1" class="csvGridListHeader">6</mat-grid-tile>
-    <mat-grid-tile colspan="4" rowspan="1" class="csvGridListHeader csvGridTileOverflowUnset">
-        <span *ngIf="loadComponent" class="csvGridTileAlignRight">
-            <button mat-icon-button="mat-icon-button" #csvBtnZoom color="primary" class="csvButton csvGridTileFloatRight" *ngIf="isDataValid">
+    <mat-grid-tile colspan="5" rowspan="1" class="csvGridListHeader csvGridTileOverflowUnset">
+        <span *ngIf="loadComponent && isDataValid" class="csvGridTileAlignRight">
+            <span *ngIf="loadComponent">
+                <mat-form-field appearance="fill" style="height: 24px;">
+                    <mat-label>Search for</mat-label>
+                    <input matInput type="text" [(ngModel)]="searchValue">
+                </mat-form-field>
+            </span>
+            <button mat-icon-button="mat-icon-button" #csvBtnZoom color="primary" class="csvButton csvGridTileFloatRight">
                 <mat-icon class="csvButtonIcon">my_location</mat-icon>
             </button>
-            <button mat-icon-button="mat-icon-button" #csvBtnLabel color="primary" class="csvButton csvGridTileFloatRight" *ngIf="isDataValid">
+            <button mat-icon-button="mat-icon-button" #csvBtnLabel color="primary" class="csvButton csvGridTileFloatRight">
                 <mat-icon class="csvButtonIcon">label</mat-icon>
             </button>
-            <mat-icon class="csvButtonIcon csvGridTileFloatRight" [style.color]="color" [cpPosition]="'bottom'" [cpPositionOffset]="'50%'" [cpPositionRelativeToArrow]="true"
-                [(colorPicker)]="color" [cpPosition]="'bottom-left'">color_lens</mat-icon>
-           <button mat-icon-button="mat-icon-button" #csvBtnMap color="primary" class="csvButton csvGridTileFloatRight" *ngIf="isDataValid">
+            <button mat-icon-button="mat-icon-button" #csvBtnLabel color="primary" class="csvButton csvGridTileFloatRight">
+                <mat-icon class="csvButtonIcon" [style.color]="color" [cpPosition]="'bottom'" [cpPositionOffset]="'50%'" [cpPositionRelativeToArrow]="true"
+                    [(colorPicker)]="color" [cpPosition]="'bottom-left'">color_lens</mat-icon>
+            </button>
+           <button mat-icon-button="mat-icon-button" #csvBtnMap color="primary" class="csvButton csvGridTileFloatRight">
                 <mat-icon class="csvButtonIcon">map</mat-icon>
             </button>
         </span>
