@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Observable, Observer, of, Subject, EMPTY, Subscription, interval, empty, throwError } from 'rxjs';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -9,6 +10,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrls: ['./growler.component.css']
 })
 export class GrowlerComponent implements OnInit, OnDestroy {
+  routeSubscription: Subscription;
 
   constructor(private route: ActivatedRoute,
     private _snackBar: MatSnackBar) {
@@ -19,14 +21,15 @@ export class GrowlerComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     //console.log("GrowlerComponent ngOnInit.");
 
-    this.route.params.subscribe(params => {
-      this.openSnackBar(params.message, params.severity);
+    this.routeSubscription = this.route.paramMap.subscribe(params => {
+      this.openSnackBar(params.get('message'), params.get('severity'));
     });
   }
 
   ngOnDestroy(): void {
     //console.log("GrowlerComponent ngOnDestroy.");
 
+    this.routeSubscription.unsubscribe();
   }
 
   openSnackBar(message: string, action: string) {

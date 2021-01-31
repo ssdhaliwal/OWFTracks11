@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Observable, Observer, of, Subject, EMPTY, Subscription, interval, empty, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-page-not-found',
@@ -8,7 +9,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class PageNotFoundComponent implements OnInit, OnDestroy {
   description: string = '';
-  
+  routeSubscription: Subscription;
+
   constructor(private route: ActivatedRoute, private router: Router) { 
     //console.log("PageNotFoundComponent constructor.");
     console.log("PageNotFoundComponent created...");
@@ -23,7 +25,9 @@ export class PageNotFoundComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-		//console.log("PageNotFoundComponent ngOnDestroy.");
+    //console.log("PageNotFoundComponent ngOnDestroy.");
+    
+    this.routeSubscription.unsubscribe();
   }
 
 }

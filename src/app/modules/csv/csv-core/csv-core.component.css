@@ -15,13 +15,13 @@
 
 .csvGridListContent {
   background: green;
-  height: calc(100vh - 103px);
+  height: calc(100vh - 68px);
   padding: 0 !important;
 }
 
 .csvGridListContentData {
   background: green;
-  height: calc(100vh - 103px);
+  height: calc(100vh - 68px);
   padding: 0 !important;
 }
 

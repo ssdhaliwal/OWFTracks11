@@ -9,6 +9,11 @@ import { ActionNotificationService } from './service/action-notification.service
 
 import * as _ from 'lodash';
 
+interface IActiveItems {
+	value: string;
+	viewValue: string;
+  }
+  
 @Component({
 	selector: 'app-root',
 	templateUrl: './app.component.html',
@@ -22,6 +27,10 @@ export class AppComponent {
 	aisUser: boolean = false;
 	firstTime: boolean = true;
 	menuOption: string = 'AppConfig';
+
+	loadActiveItems: boolean = false;
+	listActiveItems: IActiveItems[] = [];
+	listActiveSelected: string = "";
 
 	mainCSVSrc = "/OWFTracks/assets/images/main_csv.png";
 	mainSHAPESrc = "/OWFTracks/assets/images/main_shape.png";
@@ -118,13 +127,34 @@ export class AppComponent {
 	handleMainCSVClick($event) {
 		this.firstTime = false;
 
-		this.router.navigate([{
-			outlets: {
-				primary: ['message', 'Success', { title: 'Navigation', message: 'Connected to CSV Module!' }],
-				trackOutlet: ['service', 'connect.csv'],
-				errorOutlet: ['']
+		// check if there is a item already in new state
+		let notFound = true;
+		this.listActiveItems.forEach(item => {
+			if (item.viewValue === 'new-csv') {
+				notFound = false;
 			}
-		}]);
-	}
+		});
 
+		// add a new item to the menuActiveItems
+		if (notFound) {
+			let activeItem = {value: new Date().getTime().toString(16), viewValue: 'new-csv'};
+			this.loadActiveItems = true;
+			this.listActiveItems.push(activeItem);
+			this.listActiveSelected = activeItem.value;
+
+			this.router.navigate([{
+				outlets: {
+					primary: ['message', 'Success', { title: 'Navigation', message: 'Connected to CSV Module!' }],
+					trackOutlet: ['service', 'connect.csv', activeItem.value, {activeItem: activeItem}],
+					errorOutlet: ['']
+				}
+			}]);
+		} else {
+			this.router.navigate([{
+				outlets: {
+					primary: ['message', 'Info', { title: 'Navigation', message: 'new-csv item already exists, select from "ActiveList"!' }]
+				}
+			}]);
+		}
+	}
 }

@@ -1,4 +1,18 @@
-<span *ngIf="ready"><app-menu></app-menu></span>
+<span *ngIf="ready">
+    <app-menu></app-menu>
+    <span style="position: absolute; right: 0;padding: 0 16px;top: 0px;">
+        <span *ngIf="loadActiveItems">
+            <mat-form-field appearance="fill" style="height: 24px;font-size: 8px;">
+                <mat-label>Active Items</mat-label>
+                <mat-select [(value)]="listActiveSelected">
+                    <mat-option *ngFor="let layer of listActiveItems" [value]="layer.value">
+                        {{layer.viewValue}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </span>
+    </span>
+</span>
 <router-outlet></router-outlet>
 <router-outlet name="trackOutlet"></router-outlet>
 <router-outlet name="errorOutlet"></router-outlet>

@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ElementRef, ChangeDetectorRef, Input, ViewChild, NgZone } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Observable, Observer, of, Subject, EMPTY, Subscription, interval, empty, throwError } from 'rxjs';
 import { catchError, map, filter, startWith, switchMap, tap, retry, retryWhen, delay, take } from 'rxjs/operators';
 
@@ -16,7 +17,7 @@ import { OwfApi } from '../../../library/owf-api';
 import { AbstractControl, FormControl, Validators } from '@angular/forms';
 import { ColorPickerService, Cmyk } from 'ngx-color-picker';
 
-interface Layers {
+interface ILayers {
   value: string;
   viewValue: string;
 }
@@ -29,37 +30,50 @@ interface Layers {
 export class CsvCoreComponent implements OnInit, OnDestroy {
   config: ConfigModel = null;
   subscription: Subscription;
+  routeSubscription: Subscription;
   
   public isDataValid: boolean = false;
   public loadComponent: boolean = false;
   public loadMMSISync: boolean = false;
 
+  public activeItem: any;
+
   public filename: string = "";
-  public color: string = "#ffffff";
+  public color: string = "rgba(0,255,0,0.5)";
   public records: any[] = [];
   public searchValue: string;
   public geocodeAddress: boolean = false;
 
-  public color13: string = 'rgba(0,255,0,0.5)';
-  public colorToggle: boolean = false;
-
-  public mmsiLayers: Layers[] = [
+  public mmsiLayers: ILayers[] = [
     {value: 'steak-0', viewValue: 'Steak'},
     {value: 'pizza-1', viewValue: 'Pizza'},
     {value: 'tacos-2', viewValue: 'Tacos'}
   ];
 
   constructor(private _zone: NgZone,
+    private route: ActivatedRoute,
     private configService: ConfigService,
     private userCoreService: UserCoreService,
     private notificationService: ActionNotificationService,
     private http: HttpClient,
     private cpService: ColorPickerService,
     private cdr: ChangeDetectorRef) {
+    //console.log("csv-core constructor.");
+
+    this.subscription = notificationService.publisher$.subscribe(
+        payload => {
+          console.log(`${payload.action}/${payload.value}, received by CsvCoreComponent`);
+          console.log(payload);
+        });
   }
 
   ngOnInit() {
     //console.log("csv-core initialized.");
+    
+    this.routeSubscription = this.route.firstChild.paramMap.subscribe(params => {
+      console.log(params);
+    });
+
     this.isDataValid = true;
     this.loadComponent = true;
     this.loadMMSISync = true;
@@ -72,5 +86,6 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
 
     // prevent memory leak when component destroyed
     this.subscription.unsubscribe();
+    this.routeSubscription.unsubscribe();
   }
 }

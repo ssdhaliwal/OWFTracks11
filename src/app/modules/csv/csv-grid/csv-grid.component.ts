@@ -47,6 +47,8 @@ export class CsvGridComponent implements OnInit, OnDestroy {
   constructor(private configService: ConfigService,
     private http: HttpClient,
     private notificationService: ActionNotificationService) {
+    //console.log("csv-grid constructor.");
+
     this.subscription = notificationService.publisher$.subscribe(
       payload => {
         console.log(`${payload.action}/${payload.value}, received by CsvGridComponent`);
@@ -54,6 +56,7 @@ export class CsvGridComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    //console.log("csv-grid initialized.");
   }
 
   ngOnDestroy() {

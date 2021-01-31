@@ -24,7 +24,7 @@ const appRoutes: Routes = [
     path: 'service', component: CsvCoreComponent, outlet: 'trackOutlet',
     children: [
       {
-        path: 'connect.csv',
+        path: 'connect.csv/:id',
         component: CsvCoreComponent
       }
     ]
