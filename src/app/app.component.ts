@@ -182,11 +182,35 @@ export class AppComponent {
 	handleFileChangeNotification(params) {
 		//console.log("AppComponent handleFileChangeNotification.");
 
+		let count = 0, index = -1;
+		let keeperItem = null, duplicateItem = null;
 		this.listActiveItems.forEach(item => {
 			if (item.value === params.value.id) {
 				item.viewValue = params.value.value;
 				this.listActiveSelected = item.value;
+
+				duplicateItem = item;
+				count++;
+			} else {
+				if (item.viewValue === params.value.value) {
+					count++;
+					keeperItem = item;
+				}
 			}
 		});
+
+		// if duplicate; then remove it and refocus
+		if (count > 1) {
+			index = this.listActiveItems.indexOf(keeperItem.value);
+
+			if (index >= 0) {
+				this.listActiveItems.splice(index, 1);
+				this.listActiveSelected = keeperItem.value;
+
+				this.notificationService.publisherAction({ action: 'ACTIVELIST DATA SWAP', 
+					value: { option: 'CSV', id: keeperItem.value, value: keeperItem.viewValue,
+						removeId: duplicateItem.value }});
+			}		
+		}
 	}
 }

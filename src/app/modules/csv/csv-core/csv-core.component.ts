@@ -17,6 +17,11 @@ import { OwfApi } from '../../../library/owf-api';
 import { AbstractControl, FormControl, Validators } from '@angular/forms';
 import { ColorPickerService, Cmyk } from 'ngx-color-picker';
 
+interface IMaps {
+  title: string;
+  id: number;
+}
+
 interface ILayers {
   title: string;
   uuid: string;
@@ -53,6 +58,19 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
   public records: any[] = [];
   public searchValue: string;
   public geocodeAddress: boolean = false;
+
+  public mapList: IMaps[] = [
+    {title: "M1", id: 1},
+    {title: "M2", id: 2},
+    {title: "M3", id: 3},
+    {title: "M4", id: 4},
+    {title: "M5", id: 5},
+    {title: "M6", id: 6},
+    {title: "M7", id: 7},
+    {title: "M8", id: 8},
+    {title: "M9", id: 9},
+  ];
+  mapSelected: IMaps;
 
   public mmsiLayers: ILayers[] = [{ title: "-- SELECT LAYER --", uuid: null }];
   layersDefinition: any[] = [];
@@ -126,16 +144,61 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
     this.loadMMSISync = true;
   }
 
+  handleResetClick($event) {
+    //console.log("csv-core handleResetClick.");
+
+    this.loadMMSISync = false;
+    this.loadComponent = false;
+    this.isDataValid = false;
+
+    this.componentName = "new-csv";
+    this.notificationService.publisherAction({ action: 'ACTIVELIST DATA LOADED', value: { option: 'CSV', id: this.componentId, value: this.componentName } });
+
+    this.configService.removeMemoryValue(this.componentId);
+    this.loadInitial = true;
+  }
+
+  handleShareClick($event) {
+    //console.log("csv-core handleShareClick.");
+    console.log($event);
+  }
+
+  handleLayerSelected($event) {
+    //console.log("csv-core handleLayerSelected.");
+    console.log($event);
+  }
+
+  handleSearchClear($event) {
+    //console.log("csv-core handleSearchClear.");
+    console.log($event);
+  }
+
+  handleSearch($event) {
+    //console.log("csv-core handleSearch.");
+    console.log($event);
+  }
+
+  handleMapSelected($event) {
+    //console.log("csv-core handleMapSelected.");
+    console.log($event);
+  }
+
+  handleMapClick($event) {
+    //console.log("csv-core handleMapClick.");
+    console.log($event);
+  }
+
 	handleFileChangeNotification(params) {
-		//console.log("AppComponent handleFileChangeNotification.");
+		//console.log("csv-core handleFileChangeNotification.");
 
     console.log(params);
-    // value = {option: "CSV", id: "1775e170010", value: "csv-monitor_format.txt"}
+    // value = {option: "CSV", id: "1775e170010", value: "csv-monitor_format.txt"[, removeId: ""]}
     // store current state
     // find swap item state and restore
   }
   
   private getDirectoryLayers() {
+		//console.log("csv-core getDirectoryLayers.");
     let userGroups = this.userCoreService.getUserGroupNames();
 
     let selectedLayer;
