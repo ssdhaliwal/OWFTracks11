@@ -6,6 +6,7 @@ import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform
 import { FormsModule } from '@angular/forms';
 
 import { MatButtonModule } from '@angular/material/button';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,6 +16,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { AgGridModule } from 'ag-grid-angular';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { SharedServicesModule } from '../shared-services.module';
+
+import { FileUploadButtonComponent } from '../../components/file-upload-button/file-upload-button.component';
 
 import { CsvCoreComponent } from './csv-core/csv-core.component';
 import { CsvGridComponent } from './csv-grid/csv-grid.component';
@@ -32,15 +35,16 @@ const appRoutes: Routes = [
 ];
 
 @NgModule({
-  declarations: [CsvCoreComponent, CsvGridComponent],
+  declarations: [FileUploadButtonComponent, CsvCoreComponent, CsvGridComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(appRoutes),
     NoopAnimationsModule,
     FormsModule,
+    MatButtonModule,
+    MatCheckboxModule,
     MatFormFieldModule,
     MatGridListModule,
-    MatButtonModule,
     MatIconModule,
     MatInputModule,
     MatSelectModule,

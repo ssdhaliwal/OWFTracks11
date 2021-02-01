@@ -2,9 +2,9 @@
     <app-menu></app-menu>
     <span style="position: absolute; right: 0;padding: 0 16px;top: 0px;">
         <span *ngIf="loadActiveItems">
-            <mat-form-field appearance="fill" style="height: 24px;font-size: 8px;">
+            <mat-form-field appearance="fill" style="height: 24px;font-size: 10px;">
                 <mat-label>Active Items</mat-label>
-                <mat-select [(value)]="listActiveSelected">
+                <mat-select [(value)]="listActiveSelected" (selectionChange)="handleActiveListChanged($event)">
                     <mat-option *ngFor="let layer of listActiveItems" [value]="layer.value">
                         {{layer.viewValue}}
                     </mat-option>

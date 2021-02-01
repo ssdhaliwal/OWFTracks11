@@ -93,6 +93,8 @@ export class AppComponent {
 						this.menuOption = 'ServiceCSV';
 						this.handleMainCSVClick(null);
 					}
+				} else if (payload.action === "ACTIVELIST DATA LOADED") {
+					this.handleFileChangeNotification(payload);
 				} else {
 					this.router.navigate([{
 						outlets: {
@@ -125,6 +127,8 @@ export class AppComponent {
 	}
 
 	handleMainCSVClick($event) {
+		//console.log("AppComponent handleMainCSVClick.");
+
 		this.firstTime = false;
 
 		// check if there is a item already in new state
@@ -145,7 +149,7 @@ export class AppComponent {
 			this.router.navigate([{
 				outlets: {
 					primary: ['message', 'Success', { title: 'Navigation', message: 'Connected to CSV Module!' }],
-					trackOutlet: ['service', 'connect.csv', activeItem.value, {activeItem: activeItem}],
+					trackOutlet: ['service', 'connect.csv', activeItem.value, {payload: JSON.stringify(activeItem)}],
 					errorOutlet: ['']
 				}
 			}]);
@@ -156,5 +160,33 @@ export class AppComponent {
 				}
 			}]);
 		}
+	}
+
+	handleActiveListChanged($event) {
+		//console.log("AppComponent handleFileChangeNotification.");
+		
+		let selectedId = $event.value;
+		let viewValue = "";
+		this.listActiveItems.forEach(item => {
+			if (item.value === selectedId) {
+				viewValue = item.viewValue;
+			}
+		});
+
+		// send the message to component to swap
+		if (viewValue.startsWith("csv-")) {
+			this.notificationService.publisherAction({ action: 'ACTIVELIST DATA SWAP', value: { option: 'CSV', id: selectedId, value: viewValue } });
+		}
+	}
+
+	handleFileChangeNotification(params) {
+		//console.log("AppComponent handleFileChangeNotification.");
+
+		this.listActiveItems.forEach(item => {
+			if (item.value === params.value.id) {
+				item.viewValue = params.value.value;
+				this.listActiveSelected = item.value;
+			}
+		});
 	}
 }

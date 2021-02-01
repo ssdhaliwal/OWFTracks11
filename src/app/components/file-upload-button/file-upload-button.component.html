@@ -1,0 +1,9 @@
+<button class="file-upload-button">
+    <input type="file" class="file-upload-button"
+    #fileInput
+    (change)="onFileSelect(fileInput)"
+    />
+</button>
+
+<label class="file-upload-label">File Upload</label>
+<span class="file-upload-info">{{ fileInfo }}</span>
