@@ -52,7 +52,7 @@
                     </button>
                     <mat-form-field appearance="fill" class="csvGridTileFloatRight" style="height: 24px;width: 20%;">
                         <mat-label>Map</mat-label>
-                        <mat-select (selectionChange)="handleMapSelected($event)">
+                        <mat-select (selectionChange)="handleMapSelected($event)" [(value)]="mapSelected">
                             <mat-option *ngFor="let map of mapList" [value]="map.id">
                                 {{map.title}}
                             </mat-option>
@@ -73,9 +73,5 @@
         </mat-grid-tile>
     </span>
 </mat-grid-list>
-<mat-grid-list #csvGridListDetail cols="10" class="csvGridListContent">
-    <mat-grid-tile colspan="10" rowspan="1" class="csvGridListContentData">
-        <app-csv-grid *ngIf="loadComponent" [parentFileName]="filename" [parentData]="records" [parentMessage]="searchValue" 
-            [parentColor]="color" [parentGeocode]="geocodeAddress"></app-csv-grid>
-    </mat-grid-tile>
-</mat-grid-list>
+<app-csv-grid *ngIf="loadComponent" [parentFileName]="filename" [parentData]="records" [parentMessage]="searchValue" 
+    [parentColor]="color" [parentGeocode]="geocodeAddress" [parentMapId]="mapId"></app-csv-grid>

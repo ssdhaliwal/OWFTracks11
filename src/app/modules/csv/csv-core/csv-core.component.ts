@@ -14,12 +14,16 @@ import * as _ from 'lodash';
 import { jsUtils } from '../../../library/js-utils';
 import { OwfApi } from '../../../library/owf-api';
 
+import * as xls from 'xlsx';
+import * as papa from 'papaparse';
+
 import { AbstractControl, FormControl, Validators } from '@angular/forms';
 import { ColorPickerService, Cmyk } from 'ngx-color-picker';
+import { MatSelect } from '@angular/material/select';
 
 interface IMaps {
   title: string;
-  id: number;
+  id: string;
 }
 
 interface ILayers {
@@ -53,24 +57,30 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
 
   public activeItem: any;
 
+  recordsLoaded = 0;
+  recordsError = 0;
+  recordsSelected = 0;
+  loadStatus: string = "(no file selected!)";
+
   public filename: string = "";
   public color: string = "rgba(0,255,0,0.5)";
   public records: any[] = [];
   public searchValue: string;
   public geocodeAddress: boolean = false;
+  public mapId: string = "M1";
 
   public mapList: IMaps[] = [
-    {title: "M1", id: 1},
-    {title: "M2", id: 2},
-    {title: "M3", id: 3},
-    {title: "M4", id: 4},
-    {title: "M5", id: 5},
-    {title: "M6", id: 6},
-    {title: "M7", id: 7},
-    {title: "M8", id: 8},
-    {title: "M9", id: 9},
+    {title: "M1", id: "1"},
+    {title: "M2", id: "2"},
+    {title: "M3", id: "3"},
+    {title: "M4", id: "4"},
+    {title: "M5", id: "5"},
+    {title: "M6", id: "6"},
+    {title: "M7", id: "7"},
+    {title: "M8", id: "8"},
+    {title: "M9", id: "9"},
   ];
-  mapSelected: IMaps;
+  mapSelected: string = "1";
   isZoom: boolean = false;
   isLabel: boolean = false;
 
@@ -95,6 +105,12 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
 
           if (payload.action === "ACTIVELIST DATA SWAP") {
             this.handleFileChangeNotification(payload);
+          } else if (payload.action === "CSV LAYERSYNC ENABLED") {
+            this.loadMMSISync = payload.value;
+            this.cdr.detectChanges();
+          } else if (payload.action === "CSV INVALID DATA") {
+            this.isDataValid = !payload.value;
+            this.cdr.detectChanges();
           }
         });
   }
@@ -107,7 +123,7 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
       console.log(params);
       this.componentId = params.get("id");
 
-      let payload = JSON.stringify(params.get("payload"));
+      //let payload = JSON.stringify(params.get("payload"));
       this.componentName = "csv-" + this.componentId;
 
       this.loadInitial = true;
@@ -141,9 +157,92 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
 
     this.notificationService.publisherAction({ action: 'ACTIVELIST DATA LOADED', value: { option: 'CSV', id: this.componentId, value: this.componentName } });
 
-    this.isDataValid = true;
-    this.loadComponent = true;
-    this.loadMMSISync = true;
+    this.loadFile(file);
+  }
+
+  private loadFile(file) {
+    //console.log("csv-core loadFile.");
+
+    this.records = [];
+    this.searchValue = "";
+    
+    this.recordsSelected = 0;
+    this.recordsError = 0;
+    this.recordsLoaded = 0;
+
+    this.loadComponent = false;
+    this.cdr.detectChanges();
+
+    this.loadMMSISync = false;
+    if (this.isValidCSVFile(file)) {
+      let reader = new FileReader();
+
+      this.filename = file.name;
+      if (file.name.endsWith("csv")) {
+        reader.readAsText(file);
+
+        reader.onload = () => {
+          let csvData = reader.result;
+          let csvRecordsArray = (<string>csvData).split(/\r\n|\n/);
+
+          this.recordsLoaded = 0;
+          this.recordsError = 0;
+          this.recordsSelected = 0;
+
+          let parsedValue;
+          let count = 0, error = 0;
+          csvRecordsArray.forEach((value) => {
+            parsedValue = papa.parse(value);
+
+            if (parsedValue.errors[0] !== undefined) {
+              error++;
+            } else {
+              count++;
+              this.records.push(parsedValue.data[0]);
+            }
+          });
+
+          this.recordsLoaded = count;
+          this.recordsError = error;
+          this.loadStatus = "(records loaded: " + count + ", error: " + error + ")";
+          this.loadComponent = true;
+          this.loadInitial = false;
+        };
+
+        reader.onerror = function () {
+          console.log('error is occured while reading file!');
+        };
+      } else {
+        reader.readAsArrayBuffer(file);
+        reader.onload = () => {
+          let xlsData: ArrayBuffer = <ArrayBuffer>reader.result;
+          var data = new Uint8Array(xlsData);
+          var workbook = xls.read(data, { type: 'array' });
+          var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+
+          // header: 1 instructs xlsx to create an 'array of arrays'
+          var result = xls.utils.sheet_to_json(firstSheet, { header: 1 });
+
+          // data preview
+          let count = 0, error = 0;
+          result.forEach((item, index) => {
+            count++;
+            this.records.push(item);
+          });
+
+          this.loadStatus = "(records loaded: " + count + ", error: " + error + ")";
+          this.loadComponent = true;
+          this.loadInitial = false;
+        };
+      }
+    } else {
+      window.alert("Please import valid .csv file.");
+      this.loadInitial = true;
+
+      this.isDataValid = false;
+      this.loadComponent = false;
+      this.loadMMSISync = false;
+      }
   }
 
   handleResetClick($event) {
@@ -172,40 +271,55 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
 
   handleSearchClear($event) {
     //console.log("csv-core handleSearchClear.");
-    console.log($event);
+
+    this.searchValue = "";
+    this.notificationService.publisherAction({ action: 'CSV SEARCH VALUE', value: "" });
+
+    this.recordsSelected = 0;
   }
 
   handleSearch($event) {
     //console.log("csv-core handleSearch.");
-    console.log($event);
+
+    if ($event.key === "Enter") {
+      this.searchValue = (this.searchValue + "").trim();
+      this.notificationService.publisherAction({ action: 'CSV SEARCH VALUE', value: this.searchValue });
+
+      if (this.searchValue === "") {
+        this.recordsSelected = 0;
+      }
+    }
   }
 
   handleMapSelected($event) {
     //console.log("csv-core handleMapSelected.");
-    console.log($event);
+
+    this.mapId = this.mapSelected;
+    this.notificationService.publisherAction({ action: 'CSV MAPID UPDATED', value: this.mapId });
   }
 
   handleMapClick($event) {
     //console.log("csv-core handleMapClick.");
-    console.log($event);
+
+    this.notificationService.publisherAction({ action: 'CSV PLOT ON MAP', value: { showLabels: this.isLabel, 
+      color: this.color, showZoom: this.isZoom, mapId: this.mapId } });
   }
 
   handleZoomClick($event) {
     //console.log("csv-core handleZoomClick.");
-    console.log($event);
+
     this.isZoom = !this.isZoom;
   }
 
   handleLabelClick($event) {
     //console.log("csv-core handleLabelClick.");
-    console.log($event);
+
     this.isLabel = !this.isLabel;
   }
 
 	handleFileChangeNotification(params) {
 		//console.log("csv-core handleFileChangeNotification.");
 
-    console.log(params);
     // value = {option: "CSV", id: "1775e170010", value: "csv-monitor_format.txt"[, removeId: ""]}
     let removeId = "";
     if (params.hasOwnProperty("removeId")) {
@@ -380,6 +494,12 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
           }
         });
     });
+  }
+
+  private isValidCSVFile(file: any) {
+    //console.log("csv-core isValidCSVFile.");
+
+    return (!file ? false : (file.name.endsWith(".csv") || file.name.endsWith(".xls") || file.name.endsWith(".xlsx")));
   }
 
   private handleError(error: HttpErrorResponse) {
