@@ -207,9 +207,11 @@ export class AppComponent {
 				this.listActiveItems.splice(index, 1);
 				this.listActiveSelected = keeperItem.value;
 
-				this.notificationService.publisherAction({ action: 'ACTIVELIST DATA SWAP', 
-					value: { option: 'CSV', id: keeperItem.value, value: keeperItem.viewValue,
-						removeId: duplicateItem.value }});
+				if (keeperItem.viewValue !== "new-csv") {
+					this.notificationService.publisherAction({ action: 'ACTIVELIST DATA SWAP', 
+						value: { option: 'CSV', id: keeperItem.value, value: keeperItem.viewValue,
+							removeId: duplicateItem.value }});
+				}
 			}		
 		}
 	}

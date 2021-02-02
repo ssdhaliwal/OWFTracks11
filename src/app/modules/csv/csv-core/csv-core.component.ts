@@ -71,6 +71,8 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
     {title: "M9", id: 9},
   ];
   mapSelected: IMaps;
+  isZoom: boolean = false;
+  isLabel: boolean = false;
 
   public mmsiLayers: ILayers[] = [{ title: "-- SELECT LAYER --", uuid: null }];
   layersDefinition: any[] = [];
@@ -188,13 +190,46 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
     console.log($event);
   }
 
+  handleZoomClick($event) {
+    //console.log("csv-core handleZoomClick.");
+    console.log($event);
+    this.isZoom = !this.isZoom;
+  }
+
+  handleLabelClick($event) {
+    //console.log("csv-core handleLabelClick.");
+    console.log($event);
+    this.isLabel = !this.isLabel;
+  }
+
 	handleFileChangeNotification(params) {
 		//console.log("csv-core handleFileChangeNotification.");
 
     console.log(params);
     // value = {option: "CSV", id: "1775e170010", value: "csv-monitor_format.txt"[, removeId: ""]}
-    // store current state
-    // find swap item state and restore
+    let removeId = "";
+    if (params.hasOwnProperty("removeId")) {
+      removeId = params.removeId;
+      this.configService.removeMemoryValue(removeId);
+    }
+
+    // store current state and restore id
+    if (params.id !== this.componentId) {
+      this.configService.setMemoryValue(this.componentId, {
+        componentId: this.componentId,
+        componentName: this.componentName,
+        columns: {},
+        data: {},
+        filters: {},
+        view: {}
+      });
+
+      // reset the component grid
+      this.loadComponent = false;
+
+      // find swap item state and restore
+      let config = this.configService.getMemoryValue(params.id);
+    }
   }
   
   private getDirectoryLayers() {

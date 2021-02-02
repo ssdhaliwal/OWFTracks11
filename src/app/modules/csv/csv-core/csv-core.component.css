@@ -60,3 +60,7 @@
 .csvGridGeocodeCheckbox {
   margin: 0 10px;
 }
+
+.csvButtonIcon.not-active {
+  background-color: silver;
+}

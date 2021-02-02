@@ -59,11 +59,11 @@
                         </mat-select>
                     </mat-form-field>
                 </span>
-                <button mat-icon-button="mat-icon-button" #csvBtnZoom color="primary" class="csvButton csvGridTileFloatRight">
-                    <mat-icon class="csvButtonIcon">my_location</mat-icon>
+                <button mat-icon-button="mat-icon-button" color="primary" class="csvButton csvGridTileFloatRight">
+                    <mat-icon #csvBtnZoom class="csvButtonIcon" [class.not-active]="isZoom" (click)="handleZoomClick($event)">my_location</mat-icon>
                 </button>
-                <button mat-icon-button="mat-icon-button" #csvBtnLabel color="primary" class="csvButton csvGridTileFloatRight">
-                    <mat-icon class="csvButtonIcon">label</mat-icon>
+                <button mat-icon-button="mat-icon-button" color="primary" class="csvButton csvGridTileFloatRight">
+                    <mat-icon #csvBtnLabel class="csvButtonIcon" [class.not-active]="isLabel" (click)="handleLabelClick($event)">label</mat-icon>
                 </button>
                 <button mat-icon-button="mat-icon-button" #csvBtnLabel color="primary" class="csvButton csvGridTileFloatRight">
                     <mat-icon class="csvButtonIcon" [style.color]="color" [cpPosition]="'bottom'" [cpPositionOffset]="'50%'" [cpPositionRelativeToArrow]="true"
