@@ -17,9 +17,7 @@ import { OwfApi } from '../../../library/owf-api';
 import * as xls from 'xlsx';
 import * as papa from 'papaparse';
 
-import { AbstractControl, FormControl, Validators } from '@angular/forms';
 import { ColorPickerService, Cmyk } from 'ngx-color-picker';
-import { MatSelect } from '@angular/material/select';
 
 interface IMaps {
   title: string;
@@ -110,6 +108,9 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
             this.cdr.detectChanges();
           } else if (payload.action === "CSV INVALID DATA") {
             this.isDataValid = !payload.value;
+            this.cdr.detectChanges();
+          } else if (payload.action === "CSV SELECTED COUNT") {
+            this.recordsSelected = payload.value;
             this.cdr.detectChanges();
           }
         });
@@ -247,7 +248,6 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
 
   handleResetClick($event) {
     //console.log("csv-core handleResetClick.");
-
     this.loadMMSISync = false;
     this.loadComponent = false;
     this.isDataValid = false;
@@ -261,12 +261,28 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
 
   handleShareClick($event) {
     //console.log("csv-core handleShareClick.");
-    console.log($event);
+    this.notificationService.publisherAction({ action: 'CSV SAVE TO CATALOG', value: { showLabels: this.isLabel, 
+      color: this.color, showZoom: this.isZoom, mapId: this.mapId } });
   }
 
   handleLayerSelected($event) {
     //console.log("csv-core handleLayerSelected.");
-    console.log($event);
+    let selectedUUID = $event.value;
+
+    // change ui state and force change
+    if (selectedUUID !== null) {
+      this.layersDefinition.forEach((value, index) => {
+        if (value.uuid === selectedUUID) {
+          this.layerSelected = value;
+          this.notificationService.publisherAction({ action: 'CSV LAYERSYNC LAYERINFO', value: value });
+        }
+      });
+    }
+  }
+
+  handleLayerRefresh($event) {
+    //console.log("csv-core handleLayerRefresh.");
+    this.handleLayerSelected({ source: null, value: this.layerSelected.uuid });
   }
 
   handleSearchClear($event) {

@@ -5,6 +5,9 @@
     <div #layerExport id="layerExport" [ngStyle]="divLayerExportCss" (click)="handleExportClick($event)">
       <img src="{{layerExportImageSrc}}" title="Export data..."
         style="width:20px;height:20px;padding:1px;margin-left:5px;">
+      <span *ngIf="recordsSelected > 0" style="white-space: nowrap;color: darkslategray;">&nbsp;&nbsp;[Selected - 
+        <label>{{recordsSelected}}]</label>
+      </span>
     </div>
     <ag-grid-angular #agGridCSV class="ag-theme-balham" [rowData]="rowData" 
       [columnDefs]="columnDefinitions" [getRowStyle]="getRowStyle" [domLayout]="domLayout" [pagination]="true"

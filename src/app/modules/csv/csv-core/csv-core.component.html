@@ -31,7 +31,8 @@
                     </mat-select>
                 </mat-form-field>
                 <button mat-icon-button="mat-icon-button" #csvBtnRefresh color="primary" class="csvButton">
-                    <mat-icon class="csvButtonIcon" style="vertical-align: baseline;">update</mat-icon>
+                    <mat-icon class="csvButtonIcon" style="vertical-align: baseline;"
+                        (click)="handleLayerRefresh($event)">update</mat-icon>
                 </button>
             </span>
         </mat-grid-tile>

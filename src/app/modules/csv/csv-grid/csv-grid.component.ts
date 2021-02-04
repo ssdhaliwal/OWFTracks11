@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, Input, ViewChild, NgZone, ChangeDetectorRef } from '@angular/core';
 import { Observable, Observer, of, Subject, EMPTY, Subscription, interval, empty, throwError } from 'rxjs';
 import { catchError, map, filter, startWith, switchMap, tap, retry, retryWhen, delay, take } from 'rxjs/operators';
 
@@ -66,7 +66,7 @@ export class CsvGridComponent implements OnInit, OnDestroy {
     'z-index': 3,
     'width': '22px',
     'height': '22px',
-    'display': 'inline',
+    'display': 'flex',
     'position': 'absolute',
     'top': 'calc(100vh - 30px)'
   }
@@ -94,6 +94,7 @@ export class CsvGridComponent implements OnInit, OnDestroy {
   selectedNodesCache: any[] = [];
   geocodeRecord: any;
   geocodeRecords: any[] = [];
+  recordsSelected = 0;
 
   domLayout = "normal";
   rowSelection = "multiple";
@@ -128,9 +129,11 @@ export class CsvGridComponent implements OnInit, OnDestroy {
     }
   }
 
-  constructor(private configService: ConfigService,
+  constructor(private _zone: NgZone,
+    private configService: ConfigService,
     private http: HttpClient,
-    private notificationService: ActionNotificationService) {
+    private notificationService: ActionNotificationService,
+    private cdr: ChangeDetectorRef) {
       //console.log("csv-grid constructor.");
 
       this.subscription = notificationService.publisher$.subscribe(
@@ -161,6 +164,20 @@ export class CsvGridComponent implements OnInit, OnDestroy {
               }
   
               this.gridApi.setQuickFilter(this.searchValue);
+              if (this.filterActive) {
+                let selectedRows = this.gridApi.getSelectedRows();
+                if (selectedRows.length !== 0) {
+                  this.recordsSelected = selectedRows.length;
+                } else {
+                  this.recordsSelected = 0;
+                  this.gridApi.forEachNodeAfterFilter((node, index) => {
+                    this.recordsSelected++;
+                  });
+                }
+              } else {
+                this.recordsSelected = 0;
+              }
+              this.cdr.detectChanges();
             } else if ((payload.action === "CSV PLOT ON MAP") || (payload.action === "CSV SAVE TO CATALOG")) {
               let tracks = [];
               if (this.filterActive) {
@@ -954,6 +971,7 @@ export class CsvGridComponent implements OnInit, OnDestroy {
       this.gridApi.redrawRows({ rowNodes: this.selectedNodesCache });
       this.selectedNodesCache = this.gridApi.getSelectedNodes();
   
+      this.recordsSelected = 0;
       if ((this.columnTracking[0] === -1) ||
         (this.columnTracking[1] === -1) || (this.columnTracking[2] === -1)) {
       } else {
@@ -962,8 +980,9 @@ export class CsvGridComponent implements OnInit, OnDestroy {
         let tracks;
         if (selectedRows.length > 0) {
           tracks = selectedRows;
-          this.notificationService.publisherAction({ action: 'CSV SELECTED COUNT', value: selectedRows.length });
-  
+          this.recordsSelected = selectedRows.length;
+          this.notificationService.publisherAction({ action: 'CSV SELECTED COUNT', value: this.recordsSelected });
+          
           this.plotMarker(tracks, false, "#000000", true, false, true, this.parentMapId);
         }
       }
