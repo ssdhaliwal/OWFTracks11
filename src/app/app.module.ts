@@ -48,9 +48,11 @@ import { GrowlerComponent } from './components/growler/growler.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 
 import { CsvModule } from './modules/csv/csv.module';
+import { ShapeModule } from './modules/shape/shape.module';
 
 const routes: Routes = [
   { path: 'service', loadChildren: './modules/csv/csv.module#CsvModule' },
+  { path: 'service', loadChildren: './modules/shape/shape.module#ShapeModule' },
   { path: '', redirectTo: '/', pathMatch: 'full' },
   { path: 'message/:severity', component: GrowlerComponent },
   { path: '**', component: PageNotFoundComponent, outlet: 'trackOutlet' },
@@ -106,7 +108,8 @@ const routes: Routes = [
     AgGridModule.withComponents([]),
     ColorPickerModule,
     SharedServicesModule.forRoot(),
-    CsvModule
+    CsvModule,
+    ShapeModule
   ],
   providers: [],
   bootstrap: [AppComponent]

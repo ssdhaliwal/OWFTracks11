@@ -17,23 +17,23 @@ import { AgGridModule } from 'ag-grid-angular';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { SharedServicesModule } from '../shared-services.module';
 
-import { CsvCoreComponent } from './csv-core/csv-core.component';
-import { CsvGridComponent } from './csv-grid/csv-grid.component';
+import { ShapeCoreComponent } from './shape-core/shape-core.component';
+import { ShapeGridComponent } from './shape-grid/shape-grid.component';
 
 const appRoutes: Routes = [
   {
-    path: 'service', component: CsvCoreComponent, outlet: 'trackOutlet',
+    path: 'service', component: ShapeCoreComponent, outlet: 'trackOutlet',
     children: [
       {
-        path: 'connect.csv/:id',
-        component: CsvCoreComponent
+        path: 'connect.shape/:id',
+        component: ShapeCoreComponent
       }
     ]
   }
 ];
 
 @NgModule({
-  declarations: [CsvCoreComponent, CsvGridComponent],
+  declarations: [ShapeCoreComponent, ShapeGridComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(appRoutes),
@@ -50,6 +50,6 @@ const appRoutes: Routes = [
     ColorPickerModule,
     SharedServicesModule.forRoot()
   ],
-  exports: [CsvCoreComponent, CsvGridComponent]
+  exports: [ShapeCoreComponent, ShapeGridComponent]
 })
-export class CsvModule { }
+export class ShapeModule { }

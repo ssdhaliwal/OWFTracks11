@@ -15,7 +15,7 @@ let MenuModel: MenuItem[] = [{
             iconName: 'star_rate',
             disabled: false
         }, {
-            displayName: 'Connect Shape File',
+            displayName: 'Connect Shape',
             iconName: 'star_rate',
             disabled: false
         }, {

@@ -12,8 +12,8 @@ import * as _ from 'lodash';
 interface IActiveItems {
 	value: string;
 	viewValue: string;
-  }
-  
+}
+
 @Component({
 	selector: 'app-root',
 	templateUrl: './app.component.html',
@@ -92,6 +92,9 @@ export class AppComponent {
 					if (payload.value === "Connect CSV") {
 						this.menuOption = 'ServiceCSV';
 						this.handleMainCSVClick(null);
+					} else if (payload.value === "Connect Shape") {
+						this.menuOption = 'ServiceSHAPE';
+						this.handleMainSHAPEClick(null);
 					}
 				} else if (payload.action === "ACTIVELIST DATA LOADED") {
 					this.handleFileChangeNotification(payload);
@@ -141,7 +144,7 @@ export class AppComponent {
 
 		// add a new item to the menuActiveItems
 		if (notFound) {
-			let activeItem = {value: new Date().getTime().toString(16), viewValue: 'new-csv'};
+			let activeItem = { value: new Date().getTime().toString(16), viewValue: 'new-csv' };
 			this.loadActiveItems = true;
 			this.listActiveItems.push(activeItem);
 			this.listActiveSelected = activeItem.value;
@@ -149,7 +152,7 @@ export class AppComponent {
 			this.router.navigate([{
 				outlets: {
 					primary: ['message', 'Success', { title: 'Navigation', message: 'Connected to CSV Module!' }],
-					trackOutlet: ['service', 'connect.csv', activeItem.value, {payload: JSON.stringify(activeItem)}],
+					trackOutlet: ['service', 'connect.csv', activeItem.value, { payload: JSON.stringify(activeItem) }],
 					errorOutlet: ['']
 				}
 			}]);
@@ -162,9 +165,45 @@ export class AppComponent {
 		}
 	}
 
+	handleMainSHAPEClick($event) {
+		//console.log("AppComponent handleMainCSVClick.");
+
+		this.firstTime = false;
+
+		// check if there is a item already in new state
+		let notFound = true;
+		this.listActiveItems.forEach(item => {
+			if (item.viewValue === 'new-shape') {
+				notFound = false;
+			}
+		});
+
+		// add a new item to the menuActiveItems
+		if (notFound) {
+			let activeItem = { value: new Date().getTime().toString(16), viewValue: 'new-shape' };
+			this.loadActiveItems = true;
+			this.listActiveItems.push(activeItem);
+			this.listActiveSelected = activeItem.value;
+
+			this.router.navigate([{
+				outlets: {
+					primary: ['message', 'Success', { title: 'Navigation', message: 'Connected to SHAPE Module!' }],
+					trackOutlet: ['service', 'connect.shape', activeItem.value, { payload: JSON.stringify(activeItem) }],
+					errorOutlet: ['']
+				}
+			}]);
+		} else {
+			this.router.navigate([{
+				outlets: {
+					primary: ['message', 'Info', { title: 'Navigation', message: 'new-shape item already exists, select from "ActiveList"!' }]
+				}
+			}]);
+		}
+	}
+
 	handleActiveListChanged($event) {
 		//console.log("AppComponent handleFileChangeNotification.");
-		
+
 		let selectedId = $event.value;
 		let viewValue = "";
 		this.listActiveItems.forEach(item => {
@@ -174,45 +213,27 @@ export class AppComponent {
 		});
 
 		// send the message to component to swap
-		if (viewValue.startsWith("csv-")) {
-			this.notificationService.publisherAction({ action: 'ACTIVELIST DATA SWAP', value: { option: 'CSV', id: selectedId, value: viewValue } });
+		if (viewValue === "new-csv") {
+			console.log("re-open new-csv/" + viewValue);
+		} else if (viewValue.startsWith("csv-")) {
+			//this.notificationService.publisherAction({ action: 'ACTIVELIST DATA SWAP', value: { option: 'CSV', id: selectedId, value: viewValue } });
+			console.log("re-open csv/" + viewValue);
+		} else if (viewValue.startsWith("new-shape")) {
+			console.log("re-open shape/" + viewValue);
+		} else if (viewValue.startsWith("shape-")) {
+			//this.notificationService.publisherAction({ action: 'ACTIVELIST DATA SWAP', value: { option: 'SHAPE', id: selectedId, value: viewValue } });
+			console.log("re-open shape/" + viewValue);
 		}
 	}
 
 	handleFileChangeNotification(params) {
 		//console.log("AppComponent handleFileChangeNotification.");
 
-		let count = 0, index = -1;
-		let keeperItem = null, duplicateItem = null;
 		this.listActiveItems.forEach(item => {
 			if (item.value === params.value.id) {
 				item.viewValue = params.value.value;
 				this.listActiveSelected = item.value;
-
-				duplicateItem = item;
-				count++;
-			} else {
-				if (item.viewValue === params.value.value) {
-					count++;
-					keeperItem = item;
-				}
 			}
 		});
-
-		// if duplicate; then remove it and refocus
-		if (count > 1) {
-			index = this.listActiveItems.indexOf(keeperItem.value);
-
-			if (index >= 0) {
-				this.listActiveItems.splice(index, 1);
-				this.listActiveSelected = keeperItem.value;
-
-				if (keeperItem.viewValue !== "new-csv") {
-					this.notificationService.publisherAction({ action: 'ACTIVELIST DATA SWAP', 
-						value: { option: 'CSV', id: keeperItem.value, value: keeperItem.viewValue,
-							removeId: duplicateItem.value }});
-				}
-			}		
-		}
 	}
 }
