@@ -205,24 +205,50 @@ export class AppComponent {
 		//console.log("AppComponent handleFileChangeNotification.");
 
 		let selectedId = $event.value;
-		let viewValue = "";
+		let activeItem = null;
 		this.listActiveItems.forEach(item => {
 			if (item.value === selectedId) {
-				viewValue = item.viewValue;
+				activeItem = item;
 			}
 		});
 
 		// send the message to component to swap
-		if (viewValue === "new-csv") {
-			console.log("re-open new-csv/" + viewValue);
-		} else if (viewValue.startsWith("csv-")) {
-			//this.notificationService.publisherAction({ action: 'ACTIVELIST DATA SWAP', value: { option: 'CSV', id: selectedId, value: viewValue } });
-			console.log("re-open csv/" + viewValue);
-		} else if (viewValue.startsWith("new-shape")) {
-			console.log("re-open shape/" + viewValue);
-		} else if (viewValue.startsWith("shape-")) {
-			//this.notificationService.publisherAction({ action: 'ACTIVELIST DATA SWAP', value: { option: 'SHAPE', id: selectedId, value: viewValue } });
-			console.log("re-open shape/" + viewValue);
+		if (activeItem.viewValue === "new-csv") {
+			console.log("re-open new-csv/" + activeItem.viewValue, this.listActiveSelected);
+			this.router.navigate([{
+				outlets: {
+					primary: ['message', 'Success', { title: 'Navigation', message: 'Connected to CSV Module!' }],
+					trackOutlet: ['service', 'connect.csv', activeItem.value, { payload: JSON.stringify(activeItem) }],
+					errorOutlet: ['']
+				}
+			}]);
+		} else if (activeItem.viewValue.startsWith("csv-")) {
+			console.log("re-open csv/" + activeItem.viewValue, this.listActiveSelected);
+			this.router.navigate([{
+				outlets: {
+					primary: ['message', 'Success', { title: 'Navigation', message: 'Connected to CSV Module!' }],
+					trackOutlet: ['service', 'connect.csv', activeItem.value, { payload: JSON.stringify(activeItem) }],
+					errorOutlet: ['']
+				}
+			}]);
+		} else if (activeItem.viewValue.startsWith("new-shape")) {
+			console.log("re-open shape/" + activeItem.viewValue, this.listActiveSelected);
+			this.router.navigate([{
+				outlets: {
+					primary: ['message', 'Success', { title: 'Navigation', message: 'Connected to SHAPE Module!' }],
+					trackOutlet: ['service', 'connect.shape', activeItem.value, { payload: JSON.stringify(activeItem) }],
+					errorOutlet: ['']
+				}
+			}]);
+		} else if (activeItem.viewValue.startsWith("shape-")) {
+			console.log("re-open shape/" + activeItem.viewValue, this.listActiveSelected);
+			this.router.navigate([{
+				outlets: {
+					primary: ['message', 'Success', { title: 'Navigation', message: 'Connected to SHAPE Module!' }],
+					trackOutlet: ['service', 'connect.shape', activeItem.value, { payload: JSON.stringify(activeItem) }],
+					errorOutlet: ['']
+				}
+			}]);
 		}
 	}
 
