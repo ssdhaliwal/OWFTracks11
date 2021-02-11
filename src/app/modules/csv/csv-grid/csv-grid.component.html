@@ -14,6 +14,15 @@
       [paginationNumberFormatter]="paginationNumberFormatter" [paginationPageSize]="paginationPageSize"
       [suppressScrollOnNewData]="true" (gridReady)="handleGridReady($event)" (firstDataRendered)="handleFirstDataRendered($event)"
       [rowSelection]="rowSelection" (rowClicked)="handleRowClicked($event)" 
-      style="width: 100%; height: 100%">
+      (selectionChanged)="saveState($event)" (cellValueChanged)="saveState($event)"
+      (rowValueChanged)="saveState($event)" (sortChanged)="saveState($event)"
+      (filterChanged)="saveState($event)" (columnVisible)="saveState($event)"
+      (columnPinned)="saveState($event)" (columnResized)="saveState($event)"
+      (columnMoved)="saveState($event)" (columnRowGroupChanged)="saveState($event)"
+      (columnValueChanged)="saveState($event)" (columnPivotModeChanged)="saveState($event)"
+      (columnPivotChanged)="saveState($event)" (columnGroupOpened)="saveState($event)"
+      (gridColumnsChanged)="saveState($event)" (displayedColumnsChanged)="saveState($event)"
+      (virtualColumnsChanged)="saveState($event)" (modelUpdated)="saveState($event)"
+      (paginationChanged)="saveState($event)" style="width: 100%; height: 100%">
     </ag-grid-angular>
   </div>

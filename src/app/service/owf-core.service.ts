@@ -68,7 +68,7 @@ export class UserCoreService {
   }
 
   retrieveUserInfo() {
-    if (this.user === null) {
+    if (!this.user) {
       this.userObservable = new Observable((observer) => {
         Ozone.pref.PrefServer.getCurrentUser({
           onSuccess: this.retrieveOwfUserSuccess.bind(this, observer),
@@ -105,7 +105,7 @@ export class UserCoreService {
   }
 
   retrieveUserUUID() {
-    if (this.uuid === "") {
+    if (!this.uuid) {
       this.uuidObservable = new Observable((observer) => {
         OWF.Preferences.getUserPreference({
           namespace: 'widget.base.user',
@@ -185,7 +185,7 @@ export class UserCoreService {
     return this.groups;
   }
   getUserGroupNames() {
-    if (this.groupNames === null) {
+    if (!this.groupNames) {
       let userGroupsRaw = this.getUserGroups();
       let userGroups = [];
       userGroupsRaw.data.forEach((group) => {
@@ -226,7 +226,7 @@ export class UserCoreService {
   }
   /*
   retrieveDashboard(userId: string): Observable<UserDashboardModel> {
-    if (this.dashboards === null) {
+    if (!this.dashboards) {
       this.dashboards = new Observable((observer) => {
         this.retrieveOwfUserDashboardInfo(userId, observer);
       });
@@ -254,7 +254,7 @@ export class UserCoreService {
         new UserDashboardStack(value.stack.approved, value.stack.id, value.stack.name,
           (value.stack.owner ? value.stack.owner.name : null), (value.stack.owner ? value.stack.owner.id : null), value.stack.imageUrl));
 
-      if (dashboards === null) {
+      if (!dashboards) {
         dashboards = new UserDashboardModel(dashboardInfo.results, dashboardInfo.success, [dashboard]);
       } else {
         dashboards.attributes.push(dashboard);
@@ -273,7 +273,7 @@ export class UserCoreService {
   }
 
   retrieveWidgets(): Observable<UserWidgetModel[]> {
-    if (this.widgets === null) {
+    if (!this.widgets) {
       this.widgets = new Observable((observer) => {
         this.retrieveOwfUserWidgetsInfo(observer);
       });

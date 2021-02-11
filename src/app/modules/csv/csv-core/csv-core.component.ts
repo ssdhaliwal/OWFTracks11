@@ -17,6 +17,7 @@ import { OwfApi } from '../../../library/owf-api';
 import * as xls from 'xlsx';
 import * as papa from 'papaparse';
 
+// https://zefoy.github.io/ngx-color-picker/
 import { ColorPickerService, Cmyk } from 'ngx-color-picker';
 
 interface IMaps {
@@ -38,12 +39,12 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
   config: ConfigModel = null;
   subscription: Subscription;
   routeSubscription: Subscription;
-  
+
   jsutils = new jsUtils();
   owfapi = new OwfApi();
 
-  componentId: string = "";
-  componentName: string = "";
+  public componentId: string = "";
+  public componentName: string = "";
 
   public loadInitial: boolean = true;
   public isDataValid: boolean = false;
@@ -54,6 +55,7 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
   connectionFailure: boolean = false;
 
   public activeItem: any;
+  public isRestoreState: boolean = false;
 
   recordsLoaded = 0;
   recordsError = 0;
@@ -68,15 +70,15 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
   public mapId: string = "M1";
 
   public mapList: IMaps[] = [
-    {title: "M1", id: "1"},
-    {title: "M2", id: "2"},
-    {title: "M3", id: "3"},
-    {title: "M4", id: "4"},
-    {title: "M5", id: "5"},
-    {title: "M6", id: "6"},
-    {title: "M7", id: "7"},
-    {title: "M8", id: "8"},
-    {title: "M9", id: "9"},
+    { title: "M1", id: "1" },
+    { title: "M2", id: "2" },
+    { title: "M3", id: "3" },
+    { title: "M4", id: "4" },
+    { title: "M5", id: "5" },
+    { title: "M6", id: "6" },
+    { title: "M7", id: "7" },
+    { title: "M8", id: "8" },
+    { title: "M9", id: "9" },
   ];
   mapSelected: string = "1";
   isZoom: boolean = false;
@@ -97,29 +99,27 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
     //console.log("csv-core constructor.");
 
     this.subscription = notificationService.publisher$.subscribe(
-        payload => {
-          console.log(`${payload.action}/${payload.value}, received by CsvCoreComponent`);
-          console.log(payload);
+      payload => {
+        console.log(`${payload.action}/${payload.value}, received by CsvCoreComponent`);
+        console.log(payload);
 
-          if (payload.action === "ACTIVELIST DATA SWAP") {
-            this.handleFileChangeNotification(payload);
-          } else if (payload.action === "CSV LAYERSYNC ENABLED") {
-            this.loadMMSISync = payload.value;
-            this.cdr.detectChanges();
-          } else if (payload.action === "CSV INVALID DATA") {
-            this.isDataValid = !payload.value;
-            this.cdr.detectChanges();
-          } else if (payload.action === "CSV SELECTED COUNT") {
-            this.recordsSelected = payload.value;
-            this.cdr.detectChanges();
-          }
-        });
+        if (payload.action === "CSV LAYERSYNC ENABLED") {
+          this.loadMMSISync = payload.value;
+          this.cdr.detectChanges();
+        } else if (payload.action === "CSV INVALID DATA") {
+          this.isDataValid = !payload.value;
+          this.cdr.detectChanges();
+        } else if (payload.action === "CSV SELECTED COUNT") {
+          this.recordsSelected = payload.value;
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   ngOnInit() {
     //console.log("csv-core initialized.");
     this.config = this.configService.getConfig();
-    
+
     this.routeSubscription = this.route.firstChild.paramMap.subscribe(params => {
       console.log(params);
       this.componentId = params.get("id");
@@ -127,11 +127,13 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
       //let payload = JSON.stringify(params.get("payload"));
       this.componentName = "csv-" + this.componentId;
 
+      this.isRestoreState = false;
       this.loadInitial = true;
       this.isDataValid = false;
       this.loadComponent = false;
       this.loadMMSISync = false;
-  
+
+      this.restoreState(this.componentId);
       this.cdr.detectChanges();
     });
 
@@ -166,7 +168,7 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
 
     this.records = [];
     this.searchValue = "";
-    
+
     this.recordsSelected = 0;
     this.recordsError = 0;
     this.recordsLoaded = 0;
@@ -243,7 +245,7 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
       this.isDataValid = false;
       this.loadComponent = false;
       this.loadMMSISync = false;
-      }
+    }
   }
 
   handleResetClick($event) {
@@ -261,8 +263,12 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
 
   handleShareClick($event) {
     //console.log("csv-core handleShareClick.");
-    this.notificationService.publisherAction({ action: 'CSV SAVE TO CATALOG', value: { showLabels: this.isLabel, 
-      color: this.color, showZoom: this.isZoom, mapId: this.mapId } });
+    this.notificationService.publisherAction({
+      action: 'CSV SAVE TO CATALOG', value: {
+        showLabels: this.isLabel,
+        color: this.color, showZoom: this.isZoom, mapId: this.mapId
+      }
+    });
   }
 
   handleLayerSelected($event) {
@@ -277,6 +283,8 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
           this.notificationService.publisherAction({ action: 'CSV LAYERSYNC LAYERINFO', value: value });
         }
       });
+    } else {
+      this.notificationService.publisherAction({ action: 'CSV LAYERSYNC LAYERINFO', value: null });
     }
   }
 
@@ -301,7 +309,7 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
       this.searchValue = (this.searchValue + "").trim();
       this.notificationService.publisherAction({ action: 'CSV SEARCH VALUE', value: this.searchValue });
 
-      if (this.searchValue === "") {
+      if (!this.searchValue) {
         this.recordsSelected = 0;
       }
     }
@@ -311,30 +319,49 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
     //console.log("csv-core handleMapSelected.");
 
     this.mapId = this.mapSelected;
-    this.notificationService.publisherAction({ action: 'CSV MAPID UPDATED', value: this.mapId });
+    this.sendOptionsUpdate();
   }
 
   handleMapClick($event) {
     //console.log("csv-core handleMapClick.");
 
-    this.notificationService.publisherAction({ action: 'CSV PLOT ON MAP', value: { showLabels: this.isLabel, 
-      color: this.color, showZoom: this.isZoom, mapId: this.mapId } });
+    this.notificationService.publisherAction({
+      action: 'CSV PLOT ON MAP', value: {
+        showLabels: this.isLabel,
+        color: this.color, showZoom: this.isZoom, mapId: this.mapId
+      }
+    });
   }
 
   handleZoomClick($event) {
     //console.log("csv-core handleZoomClick.");
 
     this.isZoom = !this.isZoom;
+    this.sendOptionsUpdate();
   }
 
   handleLabelClick($event) {
     //console.log("csv-core handleLabelClick.");
 
     this.isLabel = !this.isLabel;
+    this.sendOptionsUpdate();
   }
 
-	handleFileChangeNotification(params) {
-		//console.log("csv-core handleFileChangeNotification.");
+  handleColorChange($event) {
+    this.color = $event;
+    this.sendOptionsUpdate();
+  }
+
+  sendOptionsUpdate() {
+    this.notificationService.publisherAction({
+      action: 'CSV OPTIONS UPDATED', value: {
+        zoom: this.isZoom, label: this.isLabel, color: this.color, mapId: this.mapId
+      }
+    });
+  }
+
+  handleFileChangeNotification(params) {
+    //console.log("csv-core handleFileChangeNotification.");
 
     // value = {option: "CSV", id: "1775e170010", value: "csv-monitor_format.txt"[, removeId: ""]}
     let removeId = "";
@@ -361,14 +388,14 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
       let config = this.configService.getMemoryValue(params.id);
     }
   }
-  
+
   private getDirectoryLayers() {
-		//console.log("csv-core getDirectoryLayers.");
+    //console.log("csv-core getDirectoryLayers.");
     let userGroups = this.userCoreService.getUserGroupNames();
 
     let selectedLayer;
     this.connectionFailure = true;
-    
+
     const headers = new HttpHeaders().set('Content-Type', 'text/plain; charset=utf-8');
     this.config.directories.forEach((directory) => {
       let directoryObserable: Observable<any> = this.http
@@ -516,6 +543,30 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
     //console.log("csv-core isValidCSVFile.");
 
     return (!file ? false : (file.name.endsWith(".csv") || file.name.endsWith(".xls") || file.name.endsWith(".xlsx")));
+  }
+
+  private restoreState(id) {
+    //console.log("csv-core restoreState.");
+
+    let options = this.configService.getMemoryValue(id);
+    // api.paginationGoToPage(4)
+
+    if (options) {
+      this.isRestoreState = true;
+
+      this.filename = options.filename;
+      this.geocodeAddress = options.geocode;
+      this.searchValue = options.search;
+      this.color = options.color;
+      this.isLabel = options.isLabel;
+      this.isZoom = options.isZoom;
+      this.mapId = options.mapId;
+
+      this.layerSelected = options.layer;
+      this.mmsiLayers = options.layers;
+
+      this.records = options.data;
+    }
   }
 
   private handleError(error: HttpErrorResponse) {

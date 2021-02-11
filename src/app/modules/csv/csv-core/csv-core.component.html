@@ -66,13 +66,15 @@
                 <button mat-icon-button="mat-icon-button" color="primary" class="csvButton csvGridTileFloatRight">
                     <mat-icon #csvBtnLabel class="csvButtonIcon" [class.not-active]="!isLabel" (click)="handleLabelClick($event)">label</mat-icon>
                 </button>
-                <button mat-icon-button="mat-icon-button" #csvBtnLabel color="primary" class="csvButton csvGridTileFloatRight">
+                <button mat-icon-button="mat-icon-button" color="primary" class="csvButton csvGridTileFloatRight">
                     <mat-icon class="csvButtonIcon" [style.color]="color" [cpPosition]="'bottom'" [cpPositionOffset]="'50%'" [cpPositionRelativeToArrow]="true"
-                        [(colorPicker)]="color" [cpPosition]="'bottom-left'">color_lens</mat-icon>
+                        [(colorPicker)]="color" [cpPosition]="'bottom-left'"
+                        (colorPickerSelect)="handleColorChange($event)">color_lens</mat-icon>
                 </button>
             </span>
         </mat-grid-tile>
     </span>
 </mat-grid-list>
-<app-csv-grid *ngIf="loadComponent" [parentFileName]="filename" [parentData]="records" [parentMessage]="searchValue" 
-    [parentColor]="color" [parentGeocode]="geocodeAddress" [parentMapId]="mapId"></app-csv-grid>
+<app-csv-grid *ngIf="loadComponent" [parentId]="componentId" [parentName] = "componentName" [parentFileName]="filename" 
+    [parentData]="records" [parentMessage]="searchValue" [parentRestoreState] = "isRestoreState"
+    [parentColor]="color" [parentGeocode]="geocodeAddress" [parentMapId]="mapId" [parentLayers]="mmsiLayers"></app-csv-grid>

@@ -28,6 +28,12 @@ export class CsvGridComponent implements OnInit, OnDestroy {
   subscription: Subscription;
 
   @Input()
+  parentId: string;
+
+  @Input()
+  parentName: string;
+
+  @Input()
   parentFileName: string;
 
   @Input()
@@ -44,6 +50,12 @@ export class CsvGridComponent implements OnInit, OnDestroy {
 
   @Input()
   parentMapId: string;
+
+  @Input()
+  parentRestoreState: boolean;
+
+  @Input()
+  parentLayers: any[];
 
   parentZoom: boolean = false;
   parentLabels: boolean = false;
@@ -147,9 +159,16 @@ export class CsvGridComponent implements OnInit, OnDestroy {
           this.parentLayer = payload.value;
 
           this.credentialsRequired = false;
-          this.getLayerInfo();
-        } else if (payload.action === "CSV MAPID UPDATED") {
-          this.parentMapId = payload.value;
+          if (this.parentLayer !== null) {
+            this.getLayerInfo();
+          }
+        } else if (payload.action === "CSV OPTIONS UPDATED") {
+          this.parentColor = payload.value.color;
+          this.parentMapId = payload.value.mapId;
+          this.parentZoom = payload.value.zoom;
+          this.parentLabels = payload.value.label;
+
+          this.saveState();
         } else if (payload.action === "CSV SEARCH VALUE") {
           this.parentSearch = payload.value;
           //this.gridApi.onFilterChanged();
@@ -638,7 +657,7 @@ export class CsvGridComponent implements OnInit, OnDestroy {
     });
 
     // get token from params
-    if (this.layerToken === "") {
+    if (!this.layerToken) {
       let urlParamArray = [];
       if (urlArray.length > 1) {
         urlParamArray = urlArray[1].split("&");
@@ -964,6 +983,11 @@ export class CsvGridComponent implements OnInit, OnDestroy {
 
     this.rowData = records;
     //this.agGrid.api.setRowData(this.rowData);
+
+    if (this.parentRestoreState) {
+      this.parentRestoreState = false;
+      this.restoreState();
+    }
   }
 
   paginationNumberFormatter(params) {
@@ -1052,9 +1076,14 @@ export class CsvGridComponent implements OnInit, OnDestroy {
     this.gridApi.exportDataAsCsv(params);
   }
 
-  private saveState() {
+  saveState($event?) {
+    //console.log("csv-grid saveState.");
+
+    console.log($event);
     // https://blog.ag-grid.com/persisting-ag-grid-state-with-react-redux/
     let options = {
+      id: this.parentId,
+      name: this.parentName,
       type: "CSV",
       geocode: this.parentGeocode,
       layer: this.parentLayer,
@@ -1063,20 +1092,37 @@ export class CsvGridComponent implements OnInit, OnDestroy {
       isLabel: this.parentLabels,
       isZoom: this.parentZoom,
       mapId: this.parentMapId,
+      data: this.parentData,
+      layers: this.parentLayers,
+      filename: this.parentFileName,
       grid: {
-        columnState: this.gridOptions.columnApi.getColumnState(),
-        groupState: this.gridOptions.columnApi.getColumnGroupState(),
-        sortModel: this.gridOptions.api.getSortModel(),
-        filterModel: this.gridOptions.api.getFilterModel(),
-        data: this.gridOptions.rowData,
-        columnDefs: this.gridOptions.columnDefs,
-        pageNumber: this.gridOptions.api.paginationGetCurrentPage()
+        columnState: this.gridColumnApi.getColumnState(),
+        // groupState: this.gridOptions.columnApi.getColumnGroupState(),
+        // sortModel: this.gridOptions.api.getSortModel(),
+        // filterModel: this.gridOptions.api.getFilterModel(),
+        pageNumber: this.gridApi.paginationGetCurrentPage()
       }
     };
+
+    this.configService.setMemoryValue(this.parentId, options);
   }
 
   private restoreState() {
-    // api.paginationGoToPage(4)
+    //console.log("csv-grid restoreState.");
+
+    let options = this.configService.getMemoryValue(this.parentId);
+
+    if (options) {
+      this.gridOptions.suppressColumnStateEvents = true;
+
+      this.gridColumnApi.applyColumnState({ state: options.grid.columnState });
+      // this.gridOptions.columnApi.setColumnGroupState(options.grid.groupState);
+      // this.gridOptions.api.setSortModel(options.grid.sortModel);
+      // this.gridOptions.api.setFilterModel(options.grid.filterModel);
+      this.gridApi.paginationGoToPage(options.grid.pageNumber);
+
+      this.gridOptions.suppressColumnStateEvents = false;
+    }
   }
 
   setQueryStatus(message, status?) {
