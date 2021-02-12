@@ -132,6 +132,7 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
       this.isDataValid = false;
       this.loadComponent = false;
       this.loadMMSISync = false;
+      this.cdr.detectChanges();
 
       this.restoreState(this.componentId);
       this.cdr.detectChanges();
@@ -558,14 +559,20 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
       this.geocodeAddress = options.geocode;
       this.searchValue = options.search;
       this.color = options.color;
-      this.isLabel = options.isLabel;
-      this.isZoom = options.isZoom;
+      this.isLabel = !options.isLabel;
+      this.isZoom = !options.isZoom;
       this.mapId = options.mapId;
 
       this.layerSelected = options.layer;
       this.mmsiLayers = options.layers;
 
       this.records = options.data;
+
+      this.loadComponent = false;
+      this.loadMMSISync = false;
+    
+      this.loadComponent = true;
+      this.loadInitial = false;
     }
   }
 

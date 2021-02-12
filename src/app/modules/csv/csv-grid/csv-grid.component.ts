@@ -40,7 +40,7 @@ export class CsvGridComponent implements OnInit, OnDestroy {
   parentData: any[];
 
   @Input()
-  parentMessage: string;
+  parentSearch: string;
 
   @Input()
   parentColor: string;
@@ -60,7 +60,6 @@ export class CsvGridComponent implements OnInit, OnDestroy {
   parentZoom: boolean = false;
   parentLabels: boolean = false;
   parentLayer: any = {};
-  parentSearch: string = "";
 
   jsutils = new jsUtils();
   owfapi = new OwfApi();
@@ -140,7 +139,9 @@ export class CsvGridComponent implements OnInit, OnDestroy {
     } else if ((params.data["*UPD*"] !== undefined) && (params.data["*UPD*"] === "Y")) {
       return { 'background-color': '#258731' };
     } else {
-      return { 'background-color': 'white' };
+      if (params.data["*LATLONVALID*"] === "N") {
+        return { 'background-color': '#ff0000' };
+      } else return { 'background-color': 'white' };
     }
   }
 
@@ -307,49 +308,51 @@ export class CsvGridComponent implements OnInit, OnDestroy {
             lonX = track[data.columnTracking[2]];
             latY = track[data.columnTracking[1]];
           }
-          kmlPayload += "<Placemark> " +
-            "<name>" + (track[data.columnTracking[0]] + "").replace(/\&/g, "&amp;") + "</name> ";
+          if (lonX && latY) {
+            kmlPayload += "<Placemark> " +
+              "<name>" + (track[data.columnTracking[0]] || "").replace(/\&/g, "&amp;") + "</name> ";
 
-          if (!data.mmsiEnabled) {
-            if (track.hasOwnProperty("icon") && ((track.icon || "") !== "")) {
-              if (track.icon.startsWith("http") || track.icon.startsWith("/")) {
-                kmlPayload += "<Style><IconStyle><Icon><href>" + track.icon + "</href></Icon></IconStyle></Style>";
-              } else if (track.icon.includes(".")) {
-                kmlPayload += "<Style><IconStyle><Icon><href>/GlobalRepo/Images/Core/" + track.icon + "</href></Icon></IconStyle></Style>"
-              } else if (!track.icon.includes(".")) {
-                kmlPayload += "<Style><IconStyle><Icon><href>milstd:" + track.icon + "</href></Icon></IconStyle></Style>"
+            if (!data.mmsiEnabled) {
+              if (track.hasOwnProperty("icon") && ((track.icon || "") !== "")) {
+                if (track.icon.startsWith("http") || track.icon.startsWith("/")) {
+                  kmlPayload += "<Style><IconStyle><Icon><href>" + track.icon + "</href></Icon></IconStyle></Style>";
+                } else if (track.icon.includes(".")) {
+                  kmlPayload += "<Style><IconStyle><Icon><href>/GlobalRepo/Images/Core/" + track.icon + "</href></Icon></IconStyle></Style>"
+                } else if (!track.icon.includes(".")) {
+                  kmlPayload += "<Style><IconStyle><Icon><href>milstd:" + track.icon + "</href></Icon></IconStyle></Style>"
+                }
+              } else {
+                kmlPayload += "<styleUrl>#csv_style</styleUrl> ";
               }
             } else {
-              kmlPayload += "<styleUrl>#csv_style</styleUrl> ";
-            }
-          } else {
-            if ((track["*UPD*"] !== undefined) && (track["*UPD*"] === "Y")) {
-              kmlPayload += "<styleUrl>#csv_found</styleUrl> ";
-              if ((data.columnTracking[3] !== -1) && (track[data.columnTracking[3]] !== undefined) &&
-                (track[data.columnTracking[3]] !== null) && (track[data.columnTracking[3]] !== "")) {
-                kmlPayload += "<Style><IconStyle><heading>" + track[data.columnTracking[3]] + "</heading></IconStyle></Style>";
+              if ((track["*UPD*"] !== undefined) && (track["*UPD*"] === "Y")) {
+                kmlPayload += "<styleUrl>#csv_found</styleUrl> ";
+                if ((data.columnTracking[3] !== -1) && (track[data.columnTracking[3]] !== undefined) &&
+                  (track[data.columnTracking[3]] !== null) && (track[data.columnTracking[3]] !== "")) {
+                  kmlPayload += "<Style><IconStyle><heading>" + track[data.columnTracking[3]] + "</heading></IconStyle></Style>";
+                }
+              } else {
+                kmlPayload += "<styleUrl>#csv_notfound</styleUrl> ";
               }
-            } else {
-              kmlPayload += "<styleUrl>#csv_notfound</styleUrl> ";
             }
+
+            kmlPayload +=
+              "<Point><coordinates>" + lonX + "," + latY + ",0" + "</coordinates></Point> ";
+
+            kmlPayload += "<ExtendedData>";
+            Object.keys(track).forEach((key, index) => {
+              let value = track[key];
+
+              if (((typeof value === "string") && (value !== undefined) && (value !== null)) &&
+                (value.includes(":") || value.includes("/") || value.includes("&") || value.includes("=") || value.includes("?") ||
+                  value.includes("<") || value.includes(">"))) {
+                value = encodeURIComponent(value);
+              }
+
+              kmlPayload += "<Data name=\"" + (key + "").replace(/\&/g, "&amp;") + "\"><value>" + (value + "").replace(/\&/g, "&amp;") + "</value></Data>";
+            });
+            kmlPayload += "</ExtendedData></Placemark>";
           }
-
-          kmlPayload +=
-            "<Point><coordinates>" + lonX + "," + latY + ",0" + "</coordinates></Point> ";
-
-          kmlPayload += "<ExtendedData>";
-          Object.keys(track).forEach((key, index) => {
-            let value = track[key];
-
-            if (((typeof value === "string") && (value !== undefined) && (value !== null)) &&
-              (value.includes(":") || value.includes("/") || value.includes("&") || value.includes("=") || value.includes("?") ||
-                value.includes("<") || value.includes(">"))) {
-              value = encodeURIComponent(value);
-            }
-
-            kmlPayload += "<Data name=\"" + (key + "").replace(/\&/g, "&amp;") + "\"><value>" + (value + "").replace(/\&/g, "&amp;") + "</value></Data>";
-          });
-          kmlPayload += "</ExtendedData></Placemark>";
         });
 
         plotMessage.feature = kmlHeader + kmlStyles + kmlPayload + kmlFooter;
@@ -492,14 +495,21 @@ export class CsvGridComponent implements OnInit, OnDestroy {
           resizable: true
         });
       }
+
+      // add hidden field for lat/lon validation
+      this.columnDefinitions.push({
+        field: "*LATLONVALID*",
+        sortable: true,
+        filter: true,
+        resizable: true,
+        hide: true
+      });
+
       if (mmsiFound) {
         this.notificationService.publisherAction({ action: 'CSV LAYERSYNC ENABLED', value: true })
       }
       this.columnTracking = [titleIndex, latIndex, lonIndex, courseIndex, bearingIndex, speedIndex,
         addressIndex, streetIndex, cityIndex, stateIndex, zipIndex, countryIndex];
-
-      // remove header row from imported data
-      this.parentData.splice(0, 1);
     }
 
     return this.columnDefinitions;
@@ -877,6 +887,12 @@ export class CsvGridComponent implements OnInit, OnDestroy {
               this.rowData[index][this.columnTracking[2]] = feature.geometry.x;
               this.rowData[index]["*UPD*"] = "Y";
 
+              if (this.rowData[index][this.columnTracking[1]] && this.rowData[index][this.columnTracking[2]]) {
+                this.rowData[index]["*LATLONVALID*"] = "Y";
+              } else {
+                this.rowData[index]["*LATLONVALID*"] = "N";
+              }
+
               // update course, bearing, speed if needed and exist
               if ((this.columnTracking[3] !== -1) && (this.layerCOURSEFieldName !== "")) {
                 this.rowData[index][this.columnTracking[3]] = feature.attributes[this.layerCOURSEFieldName];
@@ -935,47 +951,58 @@ export class CsvGridComponent implements OnInit, OnDestroy {
     let columnValue = "";
     let coordinates = "";
     let count = 0;
+    let headerRow = true;
     this.parentData.forEach((value) => {
       if (value) {
         record = {};
         index = 0;
 
-        if ((filterText !== null) && (filterText !== undefined)) {
-          if (columnValue.toLowerCase().includes(filterText)) {
+        if (headerRow) {
+          headerRow = false;
+        } else {
+          if ((filterText !== null) && (filterText !== undefined)) {
+            if (columnValue.toLowerCase().includes(filterText)) {
+              validRecord = true;
+            }
+          } else {
             validRecord = true;
           }
-        } else {
-          validRecord = true;
-        }
 
-        this.rowHeaders.forEach((header) => {
-          record[header] = value[index++];
+          this.rowHeaders.forEach((header) => {
+            record[header] = value[index++];
 
-          if (header.toLowerCase() === "mmsi") {
-            this.mmsiList.push("'" + record[header] + "'");
-          } else
-            // convert lat/lon if needed
-            if ((this.columnTracking[1] !== this.columnTracking[2]) &&
-              ((header === this.columnTracking[1]) || (header === this.columnTracking[2]))) {
-              coordinates = record[header] + "";
-              count = this.jsutils.countChars(coordinates, " ");
+            if (header.toLowerCase() === "mmsi") {
+              this.mmsiList.push("'" + record[header] + "'");
+            } else
+              // convert lat/lon if needed
+              if ((this.columnTracking[1] !== this.columnTracking[2]) &&
+                ((header === this.columnTracking[1]) || (header === this.columnTracking[2]))) {
+                coordinates = record[header] + "";
+                count = this.jsutils.countChars(coordinates, " ");
 
-              // dms to dd conversion when 2, DMM when 1
-              if (count === 2) {
-                record[header] = this.jsutils.convertDMSDD(coordinates);
-              } else if (count === 1) {
-                record[header] = this.jsutils.convertDDMDD(coordinates);
+                // dms to dd conversion when 2, DMM when 1
+                if (count === 2) {
+                  record[header] = this.jsutils.convertDMSDD(coordinates);
+                } else if (count === 1) {
+                  record[header] = this.jsutils.convertDDMDD(coordinates);
+                }
+
               }
+          });
 
+          if (validRecord) {
+            if (record[this.columnTracking[1]] && record[this.columnTracking[2]]) {
+              record["*LATLONVALID*"] = "Y";
+            } else {
+              record["*LATLONVALID*"] = "N";
             }
-        });
 
-        if (validRecord) {
-          records.push(record);
+            records.push(record);
 
-          // if geocoding and record header = "geocodeAddress"
-          if (this.parentGeocode) {
-            this.geocodeRecords.push(record);
+            // if geocoding and record header = "geocodeAddress"
+            if (this.parentGeocode) {
+              this.geocodeRecords.push(record);
+            }
           }
         }
       }
@@ -1081,30 +1108,32 @@ export class CsvGridComponent implements OnInit, OnDestroy {
 
     console.log($event);
     // https://blog.ag-grid.com/persisting-ag-grid-state-with-react-redux/
-    let options = {
-      id: this.parentId,
-      name: this.parentName,
-      type: "CSV",
-      geocode: this.parentGeocode,
-      layer: this.parentLayer,
-      search: this.parentSearch,
-      color: this.parentColor,
-      isLabel: this.parentLabels,
-      isZoom: this.parentZoom,
-      mapId: this.parentMapId,
-      data: this.parentData,
-      layers: this.parentLayers,
-      filename: this.parentFileName,
-      grid: {
-        columnState: this.gridColumnApi.getColumnState(),
-        // groupState: this.gridOptions.columnApi.getColumnGroupState(),
-        // sortModel: this.gridOptions.api.getSortModel(),
-        // filterModel: this.gridOptions.api.getFilterModel(),
-        pageNumber: this.gridApi.paginationGetCurrentPage()
-      }
-    };
+    if (this.gridApi) {
+      let options = {
+        id: this.parentId,
+        name: this.parentName,
+        type: "CSV",
+        geocode: this.parentGeocode,
+        layer: this.parentLayer,
+        search: this.parentSearch,
+        color: this.parentColor,
+        isLabel: this.parentLabels,
+        isZoom: this.parentZoom,
+        mapId: this.parentMapId,
+        data: this.parentData,
+        layers: this.parentLayers,
+        filename: this.parentFileName,
+        grid: {
+          columnState: this.gridColumnApi.getColumnState(),
+          // groupState: this.gridOptions.columnApi.getColumnGroupState(),
+          // sortModel: this.gridOptions.api.getSortModel(),
+          // filterModel: this.gridOptions.api.getFilterModel(),
+          pageNumber: this.gridApi.paginationGetCurrentPage()
+        }
+      };
 
-    this.configService.setMemoryValue(this.parentId, options);
+      this.configService.setMemoryValue(this.parentId, options);
+    }
   }
 
   private restoreState() {
