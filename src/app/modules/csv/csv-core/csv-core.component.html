@@ -24,7 +24,7 @@
             <span *ngIf="loadComponent && loadMMSISync">
                 <mat-form-field appearance="fill" style="height: 24px;width: 80%;">
                     <mat-label>Layers</mat-label>
-                    <mat-select (selectionChange)="handleLayerSelected($event)">
+                    <mat-select (selectionChange)="handleLayerSelected($event)" [(value)]="layerSelectedUUID">
                         <mat-option *ngFor="let layer of mmsiLayers" [value]="layer.uuid">
                             {{layer.title}}
                         </mat-option>
@@ -53,7 +53,7 @@
                     </button>
                     <mat-form-field appearance="fill" class="csvGridTileFloatRight" style="height: 24px;width: 20%;">
                         <mat-label>Map</mat-label>
-                        <mat-select (selectionChange)="handleMapSelected($event)" [(value)]="mapSelected">
+                        <mat-select (selectionChange)="handleMapSelected($event)" [(value)]="mapSelectedId">
                             <mat-option *ngFor="let map of mapList" [value]="map.id">
                                 {{map.title}}
                             </mat-option>
@@ -77,4 +77,5 @@
 </mat-grid-list>
 <app-csv-grid *ngIf="loadComponent" [parentId]="componentId" [parentName] = "componentName" [parentFileName]="filename" 
     [parentData]="records" [parentSearch]="searchValue" [parentRestoreState] = "isRestoreState"
-    [parentColor]="color" [parentGeocode]="geocodeAddress" [parentMapId]="mapId" [parentLayers]="mmsiLayers"></app-csv-grid>
+    [parentColor]="color" [parentGeocode]="geocodeAddress" [parentMapId]="mapSelectedId" [parentLayers]="mmsiLayers"
+    [rowData]="rowData" [mmsiList]="mmsiList" [parentLayer]="layerSelected"></app-csv-grid>

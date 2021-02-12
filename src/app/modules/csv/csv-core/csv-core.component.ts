@@ -65,9 +65,12 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
   public filename: string = "";
   public color: string = "rgba(0,255,0,0.5)";
   public records: any[] = [];
+  public rowData: any[] = [];
+  public mmsiList: string[] = [];
   public searchValue: string;
   public geocodeAddress: boolean = false;
-  public mapId: string = "M1";
+  public mapSelectedId: string = "1";
+  public layerSelectedUUID: String = "";
 
   public mapList: IMaps[] = [
     { title: "M1", id: "1" },
@@ -80,13 +83,12 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
     { title: "M8", id: "8" },
     { title: "M9", id: "9" },
   ];
-  mapSelected: string = "1";
   isZoom: boolean = false;
   isLabel: boolean = false;
 
   public mmsiLayers: ILayers[] = [{ title: "-- SELECT LAYER --", uuid: null }];
   layersDefinition: any[] = [];
-  layerSelected: ILayers;
+  public layerSelected: ILayers;
 
   constructor(private _zone: NgZone,
     private route: ActivatedRoute,
@@ -267,13 +269,16 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
     this.notificationService.publisherAction({
       action: 'CSV SAVE TO CATALOG', value: {
         showLabels: this.isLabel,
-        color: this.color, showZoom: this.isZoom, mapId: this.mapId
+        color: this.color, showZoom: this.isZoom, mapId: this.mapSelectedId
       }
     });
   }
 
   handleLayerSelected($event) {
     //console.log("csv-core handleLayerSelected.");
+    if (this.isRestoreState)
+      return;
+
     let selectedUUID = $event.value;
 
     // change ui state and force change
@@ -296,7 +301,6 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
 
   handleSearchClear($event) {
     //console.log("csv-core handleSearchClear.");
-
     this.searchValue = "";
     this.notificationService.publisherAction({ action: 'CSV SEARCH VALUE', value: "" });
 
@@ -305,6 +309,8 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
 
   handleSearch($event) {
     //console.log("csv-core handleSearch.");
+    if (this.isRestoreState)
+      return;
 
     if ($event.key === "Enter") {
       this.searchValue = (this.searchValue + "").trim();
@@ -318,8 +324,9 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
 
   handleMapSelected($event) {
     //console.log("csv-core handleMapSelected.");
+    if (this.isRestoreState)
+      return;
 
-    this.mapId = this.mapSelected;
     this.sendOptionsUpdate();
   }
 
@@ -329,13 +336,15 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
     this.notificationService.publisherAction({
       action: 'CSV PLOT ON MAP', value: {
         showLabels: this.isLabel,
-        color: this.color, showZoom: this.isZoom, mapId: this.mapId
+        color: this.color, showZoom: this.isZoom, mapId: this.mapSelectedId
       }
     });
   }
 
   handleZoomClick($event) {
     //console.log("csv-core handleZoomClick.");
+    if (this.isRestoreState)
+      return;
 
     this.isZoom = !this.isZoom;
     this.sendOptionsUpdate();
@@ -343,12 +352,17 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
 
   handleLabelClick($event) {
     //console.log("csv-core handleLabelClick.");
+    if (this.isRestoreState)
+      return;
 
     this.isLabel = !this.isLabel;
     this.sendOptionsUpdate();
   }
 
   handleColorChange($event) {
+    if (this.isRestoreState)
+      return;
+
     this.color = $event;
     this.sendOptionsUpdate();
   }
@@ -356,7 +370,7 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
   sendOptionsUpdate() {
     this.notificationService.publisherAction({
       action: 'CSV OPTIONS UPDATED', value: {
-        zoom: this.isZoom, label: this.isLabel, color: this.color, mapId: this.mapId
+        zoom: this.isZoom, label: this.isLabel, color: this.color, mapId: this.mapSelectedId
       }
     });
   }
@@ -505,7 +519,7 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
                     layerMSG.zoom = service.params.zoom;
                   }
 
-                  layerMSG.mapId = 1;
+                  layerMSG.mapId = this.mapSelectedId;
                   layerMSG.url = layerUrl;
                   layerMSG["uuid"] = service["uuid"];
                   layerMSG.tempArea = {};
@@ -553,26 +567,35 @@ export class CsvCoreComponent implements OnInit, OnDestroy {
     // api.paginationGoToPage(4)
 
     if (options) {
+      console.log(options);
+
       this.isRestoreState = true;
 
       this.filename = options.filename;
       this.geocodeAddress = options.geocode;
       this.searchValue = options.search;
       this.color = options.color;
-      this.isLabel = !options.isLabel;
-      this.isZoom = !options.isZoom;
-      this.mapId = options.mapId;
+      this.isLabel = options.isLabel;
+      this.isZoom = options.isZoom;
+      this.mapSelectedId = options.mapId;
+
+      this.mmsiLayers = options.layers;
+      this.cdr.detectChanges();
 
       this.layerSelected = options.layer;
-      this.mmsiLayers = options.layers;
+      this.layerSelectedUUID = options.layer.uuid;
 
       this.records = options.data;
+      this.rowData = options.rowData;
+      this.mmsiList = options.mmsiLIst;
 
       this.loadComponent = false;
       this.loadMMSISync = false;
     
       this.loadComponent = true;
       this.loadInitial = false;
+
+      this.isRestoreState = false;
     }
   }
 

@@ -57,9 +57,17 @@ export class CsvGridComponent implements OnInit, OnDestroy {
   @Input()
   parentLayers: any[];
 
+  @Input()
+  rowData: any[] = [];
+
+  @Input()
+  mmsiList: string[] = [];
+
+  @Input()
+  parentLayer: any = {};
+
   parentZoom: boolean = false;
   parentLabels: boolean = false;
-  parentLayer: any = {};
 
   jsutils = new jsUtils();
   owfapi = new OwfApi();
@@ -98,12 +106,10 @@ export class CsvGridComponent implements OnInit, OnDestroy {
   paginationPageSize: 25;
 
   rowHeaders: any[] = [];
-  rowData: any[] = [];
   rowDataUpdate: any[] = [];
   // title/name, lat, lon, course, bearing, speed, address, street, city, state, zip, country
   columnTracking: any[] = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1];
   filterActive: boolean = false;
-  mmsiList: string[] = [];
   mmsiListBatch: any[] = [];
   mmsiListBatchIndex: 0;
   selectedNodesCache: any[] = [];
@@ -158,10 +164,12 @@ export class CsvGridComponent implements OnInit, OnDestroy {
 
         if (payload.action === "CSV LAYERSYNC LAYERINFO") {
           this.parentLayer = payload.value;
+          this.saveState();
 
           this.credentialsRequired = false;
           if (this.parentLayer !== null) {
             this.getLayerInfo();
+            this.saveState();
           }
         } else if (payload.action === "CSV OPTIONS UPDATED") {
           this.parentColor = payload.value.color;
@@ -502,7 +510,7 @@ export class CsvGridComponent implements OnInit, OnDestroy {
         sortable: true,
         filter: true,
         resizable: true,
-        hide: true
+        hide: false
       });
 
       if (mmsiFound) {
@@ -521,14 +529,26 @@ export class CsvGridComponent implements OnInit, OnDestroy {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
 
-    this.updateGridData();
+    if (this.rowData.length === 0) {
+      this.updateGridData();
 
-    // autosize all columns
-    let allColumnIds = [];
-    this.gridColumnApi.getAllColumns().forEach(function (column) {
-      allColumnIds.push(column.colId);
-    });
-    this.gridColumnApi.autoSizeColumns(allColumnIds, false);
+      // autosize all columns
+      let allColumnIds = [];
+      this.gridColumnApi.getAllColumns().forEach(function (column) {
+        allColumnIds.push(column.colId);
+      });
+      this.gridColumnApi.autoSizeColumns(allColumnIds, false);
+
+      // if geocode (and address or street need to be provided)
+      if (this.parentGeocode && ((this.columnTracking[6] !== -1) || (this.columnTracking[7] !== -1))) {
+        let queueTimer = setTimeout(() => {
+          clearInterval(queueTimer);
+          this.getGeocode();
+        }, 500);
+      }
+
+      this.saveState();
+    }
 
     if ((this.columnTracking[0] === -1) ||
       (this.columnTracking[1] === -1) || (this.columnTracking[2] === -1)) {
@@ -536,14 +556,6 @@ export class CsvGridComponent implements OnInit, OnDestroy {
       this.notificationService.publisherAction({ action: 'CSV INVALID DATA', value: true });
     } else {
       this.notificationService.publisherAction({ action: 'CSV INVALID DATA', value: false });
-    }
-
-    // if geocode (and address or street need to be provided)
-    if (this.parentGeocode && ((this.columnTracking[6] !== -1) || (this.columnTracking[7] !== -1))) {
-      let queueTimer = setTimeout(() => {
-        clearInterval(queueTimer);
-        this.getGeocode();
-      }, 500);
     }
   }
 
@@ -615,6 +627,8 @@ export class CsvGridComponent implements OnInit, OnDestroy {
               if (response.candidates.length > 0) {
                 this.geocodeRecord[this.columnTracking[1]] = response.candidates[0].location.y;
                 this.geocodeRecord[this.columnTracking[2]] = response.candidates[0].location.x;
+
+                this.geocodeRecord["*LATLONVALID*"] = "Y";
                 this.gridApi.redrawRows();
               }
             }
@@ -635,6 +649,7 @@ export class CsvGridComponent implements OnInit, OnDestroy {
         this.setQueryStatus("", "reset");
       }
     } else {
+      this.saveState();
       this.setQueryStatus("", "reset");
     }
   }
@@ -986,7 +1001,6 @@ export class CsvGridComponent implements OnInit, OnDestroy {
                 } else if (count === 1) {
                   record[header] = this.jsutils.convertDDMDD(coordinates);
                 }
-
               }
           });
 
@@ -1001,7 +1015,9 @@ export class CsvGridComponent implements OnInit, OnDestroy {
 
             // if geocoding and record header = "geocodeAddress"
             if (this.parentGeocode) {
-              this.geocodeRecords.push(record);
+              if (record["*LATLONVALID*"] === "N") {
+                this.geocodeRecords.push(record);
+              }
             }
           }
         }
@@ -1106,7 +1122,6 @@ export class CsvGridComponent implements OnInit, OnDestroy {
   saveState($event?) {
     //console.log("csv-grid saveState.");
 
-    console.log($event);
     // https://blog.ag-grid.com/persisting-ag-grid-state-with-react-redux/
     if (this.gridApi) {
       let options = {
@@ -1114,15 +1129,17 @@ export class CsvGridComponent implements OnInit, OnDestroy {
         name: this.parentName,
         type: "CSV",
         geocode: this.parentGeocode,
-        layer: this.parentLayer,
         search: this.parentSearch,
         color: this.parentColor,
         isLabel: this.parentLabels,
         isZoom: this.parentZoom,
         mapId: this.parentMapId,
         data: this.parentData,
+        rowData: this.rowData,
         layers: this.parentLayers,
+        layer: this.parentLayer,
         filename: this.parentFileName,
+        mmsiList: this.mmsiList,
         grid: {
           columnState: this.gridColumnApi.getColumnState(),
           // groupState: this.gridOptions.columnApi.getColumnGroupState(),
@@ -1132,6 +1149,7 @@ export class CsvGridComponent implements OnInit, OnDestroy {
         }
       };
 
+      console.log(options);
       this.configService.setMemoryValue(this.parentId, options);
     }
   }
